@@ -10,6 +10,7 @@ class ofxProjectM {
 	void render(int x, int y, int a, int b);
 	void audio(float* buffer);
 	void nextPreset();
+	void randomPreset();
 	char* getPresetName();
 	ofTexture getTexture();
 	int getMaxSamples();

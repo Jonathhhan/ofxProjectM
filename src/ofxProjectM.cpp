@@ -49,6 +49,9 @@ void ofxProjectM::nextPreset() {
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
 }
 
+void ofxProjectM::randomPreset() {
+	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), false);
+}
 char* ofxProjectM::getPresetName() {
 	return projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
 }
