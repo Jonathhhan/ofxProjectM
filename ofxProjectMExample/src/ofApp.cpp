@@ -151,7 +151,7 @@ void ofApp::keyPressed  (int key){
 	if( key == 'e' ){
 		soundStream.stop();
 	}
-	pm.nextPreset();
+	pm.randomPreset();
 }
 
 //--------------------------------------------------------------
