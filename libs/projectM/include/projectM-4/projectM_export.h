@@ -1,4 +1,3 @@
-
 #ifndef PROJECTM_EXPORT_H
 #define PROJECTM_EXPORT_H
 
@@ -9,10 +8,10 @@
 #  ifndef PROJECTM_EXPORT
 #    ifdef projectM_api_EXPORTS
         /* We are building this library */
-#      define PROJECTM_EXPORT __declspec(dllexport)
+#      define PROJECTM_EXPORT
 #    else
         /* We are using this library */
-#      define PROJECTM_EXPORT __declspec(dllimport)
+#      define PROJECTM_EXPORT
 #    endif
 #  endif
 
