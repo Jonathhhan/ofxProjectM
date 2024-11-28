@@ -1,4 +1,3 @@
-
 #ifndef PROJECTM_EXPORT_H
 #define PROJECTM_EXPORT_H
 
