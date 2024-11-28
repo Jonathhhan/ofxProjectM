@@ -126,7 +126,7 @@ void ofApp::draw(){
 	ofPopStyle();
 	
 	ofFill();
-	pm.render(50, 50, 800, 600);
+	pm.draw(50, 50, 800, 600);
 		
 	ofSetColor(225);
 	ofDrawBitmapString(ofToString(pm.getPresetName()), 32, 700);
