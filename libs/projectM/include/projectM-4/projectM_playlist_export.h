@@ -1,4 +1,3 @@
-
 #ifndef PROJECTM_PLAYLIST_EXPORT_H
 #define PROJECTM_PLAYLIST_EXPORT_H
 
@@ -9,10 +8,10 @@
 #  ifndef PROJECTM_PLAYLIST_EXPORT
 #    ifdef projectM_playlist_EXPORTS
         /* We are building this library */
-#      define PROJECTM_PLAYLIST_EXPORT __declspec(dllexport)
+#      define PROJECTM_PLAYLIST_EXPORT
 #    else
         /* We are using this library */
-#      define PROJECTM_PLAYLIST_EXPORT __declspec(dllimport)
+#      define PROJECTM_PLAYLIST_EXPORT
 #    endif
 #  endif
 
