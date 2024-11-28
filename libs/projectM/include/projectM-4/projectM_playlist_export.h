@@ -9,20 +9,20 @@
 #  ifndef PROJECTM_PLAYLIST_EXPORT
 #    ifdef projectM_playlist_EXPORTS
         /* We are building this library */
-#      define PROJECTM_PLAYLIST_EXPORT __attribute__((visibility("default")))
+#      define PROJECTM_PLAYLIST_EXPORT __declspec(dllexport)
 #    else
         /* We are using this library */
-#      define PROJECTM_PLAYLIST_EXPORT __attribute__((visibility("default")))
+#      define PROJECTM_PLAYLIST_EXPORT __declspec(dllimport)
 #    endif
 #  endif
 
 #  ifndef PROJECTM_PLAYLIST_NO_EXPORT
-#    define PROJECTM_PLAYLIST_NO_EXPORT __attribute__((visibility("hidden")))
+#    define PROJECTM_PLAYLIST_NO_EXPORT 
 #  endif
 #endif
 
 #ifndef PROJECTM_PLAYLIST_DEPRECATED
-#  define PROJECTM_PLAYLIST_DEPRECATED __attribute__ ((__deprecated__))
+#  define PROJECTM_PLAYLIST_DEPRECATED __declspec(deprecated)
 #endif
 
 #ifndef PROJECTM_PLAYLIST_DEPRECATED_EXPORT
