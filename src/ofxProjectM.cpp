@@ -1,12 +1,12 @@
 #include "ofxProjectM.h"
 #include <iostream>
 
-ofxProjectM::~ofxProjectM(){
+ofxProjectM::~ofxProjectM() {
 	projectm_destroy(projectMHandle);
 	projectm_playlist_destroy(projectMPlaylistHandle);
 }
 
-void ofxProjectM::load(){
+void ofxProjectM::load() {
 	windowWidth = 800;
 	windowHeight = 600;
 	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
@@ -16,12 +16,16 @@ void ofxProjectM::load(){
 	projectm_set_mesh_size(projectMHandle, 48, 32);
 	projectm_set_aspect_correction(projectMHandle, true);
 	projectm_set_fps(projectMHandle, 60);
-	projectm_set_soft_cut_duration(projectMHandle, 5);
+	projectm_set_beat_sensitivity(projectMHandle, 2.0);
+	projectm_set_hard_cut_enabled(projectMHandle, true);
+	projectm_set_hard_cut_duration(projectMHandle, 2.0);
+	projectm_set_hard_cut_sensitivity(projectMHandle, 2.0);
+	projectm_set_soft_cut_duration(projectMHandle, 2.0);
 	projectm_set_preset_locked(projectMHandle, false);
-	projectm_set_preset_duration(projectMHandle, 30.0);
+	projectm_set_preset_duration(projectMHandle, 10.0);
 	std::vector<const char*> textures = { "data/textures" };
 	projectm_set_texture_search_paths(projectMHandle, textures.data(), 1);
-	
+
 	projectMPlaylistHandle = projectm_playlist_create(projectMHandle);
 	projectm_playlist_add_path(projectMPlaylistHandle, "data/presets", true, false);
 	projectm_playlist_set_shuffle(projectMPlaylistHandle, true);
