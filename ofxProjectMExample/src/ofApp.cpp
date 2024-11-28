@@ -6,6 +6,7 @@ void ofApp::setup(){
 	ofDisableArbTex();
 	cam.setPosition(0, 0, 200);
 	projectM.load();
+	projectM.setWindowSize(800, 600);
 	std::cout << "Max samples: " << projectM.getMaxSamples() << std::endl;
 
 	int bufferSize		= 512;
@@ -25,8 +26,8 @@ void ofApp::setup(){
 
 	// if you want to set the device id to be different than the default:
 	//
-	//	auto devices = soundStream.getDeviceList();
-	//	settings.setOutDevice(devices[3]);
+	// auto devices = soundStream.getDeviceList();
+	// settings.setOutDevice(devices[1]);
 
 	// you can also get devices for an specific api:
 	//
