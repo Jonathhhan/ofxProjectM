@@ -41,5 +41,7 @@ class ofApp : public ofBaseApp{
 		float 	phase;
 		float 	phaseAdder;
 		float 	phaseAdderTarget;
-		ofxProjectM pm;
+		ofxProjectM projectM;
+		ofBoxPrimitive box;
+		ofEasyCam cam;
 };

@@ -3,8 +3,11 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofBackground(34, 34, 34);
-	pm.load();
-	std::cout << "Max samples: " << pm.getMaxSamples() << std::endl;
+	ofDisableArbTex();
+	cam.setPosition(0, 0, 200);
+	projectM.load();
+	std::cout << "Max samples: " << projectM.getMaxSamples() << std::endl;
+
 	int bufferSize		= 512;
 	sampleRate 			= 44100;
 	phase 				= 0;
@@ -65,12 +68,11 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	projectM.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
 	ofSetColor(225);
 	ofDrawBitmapString("PROJECTM EXAMPLE", 32, 32);
 	ofDrawBitmapString("press 's' to unpause the audio\npress 'e' to pause the audio", 31, 92);
@@ -126,11 +128,16 @@ void ofApp::draw(){
 	ofPopStyle();
 	
 	ofFill();
-	pm.draw(50, 50, 800, 600);
+	cam.begin();
+	projectM.bind();
+	ofEnableDepthTest();
+	box.draw();
+	ofDisableDepthTest();
+	projectM.unbind();
+	cam.end();
 		
 	ofSetColor(225);
-	ofDrawBitmapString(ofToString(pm.getPresetName()), 32, 700);
-
+	ofDrawBitmapString(ofToString(projectM.getPresetName()), 32, 700);
 }
 
 
@@ -151,12 +158,11 @@ void ofApp::keyPressed  (int key){
 	if( key == 'e' ){
 		soundStream.stop();
 	}
-	pm.randomPreset();
+	projectM.randomPreset();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased  (int key){
-
 }
 
 //--------------------------------------------------------------
@@ -180,29 +186,25 @@ void ofApp::mousePressed(int x, int y, int button){
 	bNoise = true;
 }
 
-
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
 	bNoise = false;
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
+void ofApp::mouseEntered(int x, int y) {
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
+void ofApp::mouseExited(int x, int y) {
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
+void ofApp::windowResized(int w, int h) {
 }
 
 //--------------------------------------------------------------
-void ofApp::audioOut(ofSoundBuffer & buffer){
+void ofApp::audioOut(ofSoundBuffer & buffer) {
 	//pan = 0.5f;
 	float leftScale = 1 - pan;
 	float rightScale = pan;
@@ -228,16 +230,13 @@ void ofApp::audioOut(ofSoundBuffer & buffer){
 			rAudio[i] = buffer[i*buffer.getNumChannels() + 1] = sample * volume * rightScale;
 		}
 	}
-	pm.audio(&buffer.getBuffer()[0]);
-
+	projectM.audio(&buffer.getBuffer()[0]);
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
+void ofApp::gotMessage(ofMessage msg) {
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
+void ofApp::dragEvent(ofDragInfo dragInfo) { 
 }
