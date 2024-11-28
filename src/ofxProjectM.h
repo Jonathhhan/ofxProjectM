@@ -6,8 +6,8 @@
 class ofxProjectM {
 	public: ~ofxProjectM();
 	void load();
-	void render(int x, int y);
-	void render(int x, int y, int a, int b);
+	void draw(int x, int y);
+	void draw(int x, int y, int a, int b);
 	void audio(float* buffer);
 	void nextPreset();
 	void randomPreset();
