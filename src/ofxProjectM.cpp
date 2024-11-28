@@ -31,14 +31,14 @@ void ofxProjectM::load(){
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
 }
 
-void ofxProjectM::render(int x, int y) {
+void ofxProjectM::draw(int x, int y) {
 	fbo.begin();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
 	fbo.end();
 	fbo.draw(x, y);
 }
 
-void ofxProjectM::render(int x, int y, int a, int b) {
+void ofxProjectM::draw(int x, int y, int a, int b) {
 	fbo.begin();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
 	fbo.end();
