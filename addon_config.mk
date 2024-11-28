@@ -65,8 +65,6 @@ osx:
 ios:
 	
 linux64:
-	ADDON_INCLUDES_EXCLUDE += libs/projectM/include/projectM-4/projectM_playlist_export.h
-	ADDON_INCLUDES_EXCLUDE += libs/projectM/include/projectM-4/projectM_export.h
 
 linuxarmv6l:
 
