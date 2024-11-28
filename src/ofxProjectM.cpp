@@ -9,7 +9,7 @@ ofxProjectM::~ofxProjectM(){
 void ofxProjectM::load(){
 	windowWidth = 800;
 	windowHeight = 600;
-	std::cout << projectm_get_version_string() << std::endl;
+	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
 
 	projectMHandle = projectm_create();
 	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
@@ -29,20 +29,30 @@ void ofxProjectM::load(){
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
 
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
+	tex.allocate(windowWidth, windowHeight, GL_RGBA);
+}
+
+void ofxProjectM::update() {
+	fbo.begin();
+	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
+	fbo.end();
+	tex.setUseExternalTextureID(fbo.getTexture().getTextureData().textureID);
 }
 
 void ofxProjectM::draw(int x, int y) {
-	fbo.begin();
-	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
-	fbo.end();
-	fbo.draw(x, y);
+	tex.draw(x, y);
 }
 
 void ofxProjectM::draw(int x, int y, int a, int b) {
-	fbo.begin();
-	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
-	fbo.end();
-	fbo.draw(x, y, a, b);
+	tex.draw(x, y, a, b);
+}
+
+void ofxProjectM::bind() {
+	tex.bind();
+}
+
+void ofxProjectM::unbind() {
+	tex.unbind();
 }
 
 void ofxProjectM::nextPreset() {
@@ -54,10 +64,6 @@ void ofxProjectM::randomPreset() {
 }
 char* ofxProjectM::getPresetName() {
 	return projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
-}
-
-ofTexture ofxProjectM::getTexture() {
-	return fbo.getTexture();
 }
 
 int ofxProjectM::getMaxSamples() {

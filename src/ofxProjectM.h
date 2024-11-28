@@ -6,16 +6,19 @@
 class ofxProjectM {
 	public: ~ofxProjectM();
 	void load();
+	void update();
 	void draw(int x, int y);
 	void draw(int x, int y, int a, int b);
+	void bind();
+	void unbind();
 	void audio(float* buffer);
 	void nextPreset();
 	void randomPreset();
 	char* getPresetName();
-	ofTexture getTexture();
 	int getMaxSamples();
 	projectm_handle projectMHandle;
 	projectm_playlist_handle projectMPlaylistHandle;
 	ofFbo fbo;
+	ofTexture tex;
 	int windowWidth, windowHeight;
 };
