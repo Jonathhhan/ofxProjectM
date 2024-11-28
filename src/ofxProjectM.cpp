@@ -35,6 +35,12 @@ void ofxProjectM::load() {
 	tex.allocate(windowWidth, windowHeight, GL_RGBA);
 }
 
+void ofxProjectM::setWindowSize(int x, int y) {
+	windowWidth = x;
+	windowHeight = y;
+	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
+}
+
 void ofxProjectM::update() {
 	fbo.begin();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
