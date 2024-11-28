@@ -1,5 +1,4 @@
 #include "ofxProjectM.h"
-#include <iostream>
 
 ofxProjectM::~ofxProjectM() {
 	projectm_destroy(projectMHandle);
