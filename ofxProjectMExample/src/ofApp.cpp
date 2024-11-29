@@ -138,7 +138,7 @@ void ofApp::draw(){
 	cam.end();
 		
 	ofSetColor(225);
-	ofDrawBitmapString(ofToString(projectM.getPresetName()), 32, 700);
+	ofDrawBitmapString(projectM.getPresetName(), 32, 700);
 }
 
 
