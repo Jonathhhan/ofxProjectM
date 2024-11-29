@@ -43,6 +43,7 @@ void ofxProjectM::presetSwitched(bool hardCut, void* data) {
 void ofxProjectM::setWindowSize(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
+	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
 	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
 }
 
