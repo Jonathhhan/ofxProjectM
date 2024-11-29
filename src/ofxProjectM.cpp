@@ -7,7 +7,7 @@ ofxProjectM::~ofxProjectM() {
 
 void ofxProjectM::load() {
 	windowWidth = 800;
-	windowHeight = 600;
+	windowHeight = 800;
 	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
 
 	projectMHandle = projectm_create();
