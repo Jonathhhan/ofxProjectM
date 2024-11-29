@@ -6,13 +6,13 @@ ofxProjectM::~ofxProjectM() {
 }
 
 void ofxProjectM::load() {
-	windowWidth = 1600;
-	windowHeight = 1600;
+	windowWidth = 1024;
+	windowHeight = 1024;
 	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
 
 	projectMHandle = projectm_create();
 	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
-	projectm_set_mesh_size(projectMHandle, 64, 64);
+	projectm_set_mesh_size(projectMHandle, 32, 32);
 	projectm_set_aspect_correction(projectMHandle, true);
 	projectm_set_fps(projectMHandle, 60);
 	projectm_set_beat_sensitivity(projectMHandle, 2.0);
