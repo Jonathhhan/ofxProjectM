@@ -75,8 +75,14 @@ void ofxProjectM::nextPreset() {
 void ofxProjectM::randomPreset() {
 	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), false);
 }
-char* ofxProjectM::getPresetName() {
-	return projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
+
+std::string ofxProjectM::getPresetName() {
+	char* charachter = projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
+	if (charachter == NULL) {
+		return "";
+	} else {
+		return ofToString(charachter);
+	}
 }
 
 int ofxProjectM::getMaxSamples() {
