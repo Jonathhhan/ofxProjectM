@@ -6,7 +6,7 @@ void ofApp::setup(){
 	ofDisableArbTex();
 	cam.setPosition(0, 0, 200);
 	projectM.load();
-	projectM.setWindowSize(800, 600);
+	projectM.setWindowSize(800, 800);
 	std::cout << "Max samples: " << projectM.getMaxSamples() << std::endl;
 
 	int bufferSize		= 512;
