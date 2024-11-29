@@ -31,7 +31,7 @@ void ofxProjectM::load() {
 	projectm_playlist_sort(projectMPlaylistHandle, 0, projectm_playlist_size(projectMPlaylistHandle), SORT_PREDICATE_FILENAME_ONLY, SORT_ORDER_ASCENDING);
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
 
-	projectm_set_preset_switch_requested_event_callback(projectMHandle, presetSwitched, this);
+	// projectm_set_preset_switch_requested_event_callback(projectMHandle, presetSwitched, this);
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
 }
 
