@@ -19,6 +19,7 @@ public:
 	void randomPreset();
 	char* getPresetName();
 	int getMaxSamples();
+	static void presetSwitched(bool hardCut, void* data);
 private:
 	projectm_handle projectMHandle;
 	projectm_playlist_handle projectMPlaylistHandle;
