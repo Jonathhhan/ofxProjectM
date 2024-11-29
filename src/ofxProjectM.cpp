@@ -41,9 +41,9 @@ void ofxProjectM::setWindowSize(int x, int y) {
 }
 
 void ofxProjectM::update() {
-	fbo.begin();
+	fbo.bind();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
-	fbo.end();
+	fbo.unbind();
 }
 
 void ofxProjectM::draw(int x, int y) {
