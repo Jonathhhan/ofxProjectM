@@ -19,10 +19,11 @@ public:
 	void randomPreset();
 	std::string getPresetName();
 	int getMaxSamples();
-	static void presetSwitched(bool hardCut, void* data);
+	static void presetSwitched(bool hardCut, unsigned int index, void* data);
 private:
 	projectm_handle projectMHandle;
 	projectm_playlist_handle projectMPlaylistHandle;
 	ofFbo fbo;
 	int windowWidth, windowHeight;
+	std::string presetName;
 };

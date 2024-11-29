@@ -30,14 +30,15 @@ void ofxProjectM::load() {
 	projectm_playlist_set_shuffle(projectMPlaylistHandle, true);
 	projectm_playlist_sort(projectMPlaylistHandle, 0, projectm_playlist_size(projectMPlaylistHandle), SORT_PREDICATE_FILENAME_ONLY, SORT_ORDER_ASCENDING);
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
+	presetName = projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
 
 	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
 }
 
-void ofxProjectM::presetSwitched(bool hardCut, void* data) {
+void ofxProjectM::presetSwitched(bool hardCut, unsigned int index, void* data) {
 	ofxProjectM* that = static_cast<ofxProjectM*>(data);
-	std::cout << "Preset switched!" << std::endl;
+	that->presetName = projectm_playlist_item(that->projectMPlaylistHandle, index);
 }
 
 void ofxProjectM::setWindowSize(int x, int y) {
@@ -78,12 +79,7 @@ void ofxProjectM::randomPreset() {
 }
 
 std::string ofxProjectM::getPresetName() {
-	char* charachter = projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
-	if (charachter == NULL) {
-		return "";
-	} else {
-		return ofToString(charachter);
-	}
+	return presetName;
 }
 
 int ofxProjectM::getMaxSamples() {
