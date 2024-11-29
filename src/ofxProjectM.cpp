@@ -16,7 +16,7 @@ void ofxProjectM::load() {
 	projectm_set_aspect_correction(projectMHandle, true);
 	projectm_set_fps(projectMHandle, 60);
 	projectm_set_beat_sensitivity(projectMHandle, 2.0);
-	projectm_set_hard_cut_enabled(projectMHandle, false);
+	projectm_set_hard_cut_enabled(projectMHandle, true);
 	projectm_set_hard_cut_duration(projectMHandle, 2.0);
 	projectm_set_hard_cut_sensitivity(projectMHandle, 2.0);
 	projectm_set_soft_cut_duration(projectMHandle, 2.0);
@@ -69,11 +69,11 @@ void ofxProjectM::unbind() {
 }
 
 void ofxProjectM::nextPreset() {
-	projectm_playlist_play_next(projectMPlaylistHandle, false);
+	projectm_playlist_play_next(projectMPlaylistHandle, true);
 }
 
 void ofxProjectM::randomPreset() {
-	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), false);
+	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), true);
 }
 
 std::string ofxProjectM::getPresetName() {
