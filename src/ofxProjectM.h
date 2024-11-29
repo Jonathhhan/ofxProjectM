@@ -23,6 +23,5 @@ private:
 	projectm_handle projectMHandle;
 	projectm_playlist_handle projectMPlaylistHandle;
 	ofFbo fbo;
-	ofTexture tex;
 	int windowWidth, windowHeight;
 };

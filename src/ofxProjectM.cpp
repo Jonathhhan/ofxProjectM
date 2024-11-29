@@ -32,7 +32,6 @@ void ofxProjectM::load() {
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
 
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
-	tex.allocate(windowWidth, windowHeight, GL_RGBA);
 }
 
 void ofxProjectM::setWindowSize(int x, int y) {
@@ -45,23 +44,22 @@ void ofxProjectM::update() {
 	fbo.begin();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
 	fbo.end();
-	tex.setUseExternalTextureID(fbo.getTexture().getTextureData().textureID);
 }
 
 void ofxProjectM::draw(int x, int y) {
-	tex.draw(x, y);
+	fbo.getTexture().draw(x, y);
 }
 
 void ofxProjectM::draw(int x, int y, int a, int b) {
-	tex.draw(x, y, a, b);
+	fbo.getTexture().draw(x, y, a, b);
 }
 
 void ofxProjectM::bind() {
-	tex.bind();
+	fbo.getTexture().bind();
 }
 
 void ofxProjectM::unbind() {
-	tex.unbind();
+	fbo.getTexture().unbind();
 }
 
 void ofxProjectM::nextPreset() {
