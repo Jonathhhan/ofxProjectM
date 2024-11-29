@@ -17,7 +17,7 @@ public:
 	void audio(float* buffer);
 	void nextPreset();
 	void randomPreset();
-	char* getPresetName();
+	std::string getPresetName();
 	int getMaxSamples();
 	static void presetSwitched(bool hardCut, void* data);
 private:
