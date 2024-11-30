@@ -48,6 +48,14 @@ void ofxProjectM::setWindowSize(int x, int y) {
 	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
 }
 
+void ofxProjectM::setMeshSize(int x, int y) const {
+	projectm_set_mesh_size(projectMHandle, x, y);
+}
+
+void ofxProjectM::setPresetDuration(double duration) const {
+	projectm_set_preset_duration(projectMHandle, duration);
+}
+
 void ofxProjectM::update() {
 	fbo.bind();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
@@ -70,11 +78,11 @@ void ofxProjectM::unbind() {
 	fbo.getTexture().unbind();
 }
 
-void ofxProjectM::nextPreset() {
+void ofxProjectM::nextPreset() const {
 	projectm_playlist_play_next(projectMPlaylistHandle, true);
 }
 
-void ofxProjectM::randomPreset() {
+void ofxProjectM::randomPreset() const {
 	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), true);
 }
 
@@ -86,6 +94,6 @@ int ofxProjectM::getMaxSamples() {
 	return projectm_pcm_get_max_samples();
 }
 
-void ofxProjectM::audio(float* buffer) {
+void ofxProjectM::audio(float* buffer) const {
 	projectm_pcm_add_float(projectMHandle, buffer, 512, PROJECTM_STEREO);
 }
