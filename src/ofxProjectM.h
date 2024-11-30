@@ -22,6 +22,7 @@ public:
 	std::string getPresetName();
 	int getMaxSamples();
 	static void presetSwitched(bool hardCut, unsigned int index, void* data);
+	static void presetSwitchFailed(const char* presetFilename, const char* message, void* data);
 private:
 	projectm_handle projectMHandle;
 	projectm_playlist_handle projectMPlaylistHandle;
