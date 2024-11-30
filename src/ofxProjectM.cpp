@@ -6,6 +6,7 @@ ofxProjectM::~ofxProjectM() {
 }
 
 void ofxProjectM::load() {
+	ofSetRandomSeed(ofGetSystemTimeMillis());
 	windowWidth = 1024;
 	windowHeight = 1024;
 	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
