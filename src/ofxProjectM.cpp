@@ -33,6 +33,7 @@ void ofxProjectM::load() {
 	projectm_playlist_sort(projectMPlaylistHandle, 0, projectm_playlist_size(projectMPlaylistHandle), SORT_PREDICATE_FILENAME_ONLY, SORT_ORDER_ASCENDING);
 	projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, projectm_playlist_size(projectMPlaylistHandle) - 1), true);
 	presetName = projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
+	
 	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
 	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, this);
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
