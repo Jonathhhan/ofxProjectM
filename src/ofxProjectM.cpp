@@ -10,6 +10,7 @@ void ofxProjectM::load() {
 	windowWidth = 1024;
 	windowHeight = 1024;
 	std::cout << "projectM version: " << projectm_get_version_string() << std::endl;
+	// std::cout << "projectM max samples: " << projectm_pcm_get_max_samples() << std::endl;
 
 	projectMHandle = projectm_create();
 	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
@@ -102,6 +103,6 @@ int ofxProjectM::getMaxSamples() {
 	return projectm_pcm_get_max_samples();
 }
 
-void ofxProjectM::audio(float* buffer) const {
-	projectm_pcm_add_float(projectMHandle, buffer, 512, PROJECTM_STEREO);
+void ofxProjectM::audio(float* buffer, int bufferSize, int channels) const {
+	projectm_pcm_add_float(projectMHandle, buffer, bufferSize, (projectm_channels)channels);
 }
