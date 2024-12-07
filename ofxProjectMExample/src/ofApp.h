@@ -32,6 +32,8 @@ class ofApp : public ofBaseApp{
 		int		sampleRate;
 		bool 	bNoise;
 		float 	volume;
+		int bufferSize;
+		int outChannels;
 
 		vector <float> lAudio;
 		vector <float> rAudio;
