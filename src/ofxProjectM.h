@@ -16,7 +16,7 @@ public:
 	void draw(int x, int y, int a, int b);
 	void bind();
 	void unbind();
-	void audio(float* buffer) const;
+	void audio(float * buffer, int bufferSize, int channels) const;
 	void nextPreset() const;
 	void randomPreset() const;
 	std::string getPresetName();
