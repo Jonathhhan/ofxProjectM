@@ -28,10 +28,10 @@ class ofApp : public ofBaseApp{
 		
 		ofSoundStream soundStream;
 
-		float 	pan;
-		int		sampleRate;
-		bool 	bNoise;
-		float 	volume;
+		float pan;
+		int sampleRate;
+		bool bNoise;
+		float volume;
 		int bufferSize;
 		int outputChannels;
 
@@ -39,10 +39,10 @@ class ofApp : public ofBaseApp{
 		vector <float> rAudio;
 		
 		//------------------- for the simple sine wave synthesis
-		float 	targetFrequency;
-		float 	phase;
-		float 	phaseAdder;
-		float 	phaseAdderTarget;
+		float targetFrequency;
+		float phase;
+		float phaseAdder;
+		float phaseAdderTarget;
 
 		ofxProjectM projectM;
 		ofBoxPrimitive box;
