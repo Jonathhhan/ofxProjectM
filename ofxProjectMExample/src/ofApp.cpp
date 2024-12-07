@@ -9,13 +9,14 @@ void ofApp::setup(){
 	projectM.setWindowSize(1024, 1024);
 	std::cout << "Max samples: " << projectM.getMaxSamples() << std::endl;
 
-	int bufferSize		= 512;
-	sampleRate 			= 44100;
-	phase 				= 0;
-	phaseAdder 			= 0.0f;
-	phaseAdderTarget 	= 0.0f;
-	volume				= 0.1f;
-	bNoise 				= false;
+	bufferSize = 512;
+	outputChannels = 2;
+	sampleRate = 44100;
+	phase = 0;
+	phaseAdder = 0.0f;
+	phaseAdderTarget = 0.0f;
+	volume = 0.1f;
+	bNoise = false;
 
 	lAudio.assign(bufferSize, 0.0);
 	rAudio.assign(bufferSize, 0.0);
@@ -57,7 +58,7 @@ void ofApp::setup(){
 
 	settings.setOutListener(this);
 	settings.sampleRate = sampleRate;
-	settings.numOutputChannels = 2;
+	settings.numOutputChannels = outputChannels;
 	settings.numInputChannels = 0;
 	settings.bufferSize = bufferSize;
 	soundStream.setup(settings);
@@ -66,10 +67,10 @@ void ofApp::setup(){
 	// use ofFmodSetBuffersize(bufferSize) to set the buffersize in fmodx prior to loading a file.
 }
 
-
 //--------------------------------------------------------------
 void ofApp::update(){
 	projectM.update();
+	projectM.audio(&buffer.getBuffer()[0], bufferSize, outputChannels);
 }
 
 //--------------------------------------------------------------
@@ -140,7 +141,6 @@ void ofApp::draw(){
 	ofSetColor(225);
 	ofDrawBitmapString(projectM.getPresetName(), 32, 700);
 }
-
 
 //--------------------------------------------------------------
 void ofApp::keyPressed  (int key){
@@ -231,7 +231,6 @@ void ofApp::audioOut(ofSoundBuffer & buffer) {
 			rAudio[i] = buffer[i*buffer.getNumChannels() + 1] = sample * volume * rightScale;
 		}
 	}
-	projectM.audio(&buffer.getBuffer()[0]);
 }
 
 //--------------------------------------------------------------
