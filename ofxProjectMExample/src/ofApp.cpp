@@ -70,7 +70,6 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	projectM.update();
-	projectM.audio(&buffer.getBuffer()[0], bufferSize, outputChannels);
 }
 
 //--------------------------------------------------------------
@@ -231,6 +230,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer) {
 			rAudio[i] = buffer[i*buffer.getNumChannels() + 1] = sample * volume * rightScale;
 		}
 	}
+	projectM.audio(&buffer.getBuffer()[0], bufferSize, outputChannels);
 }
 
 //--------------------------------------------------------------
