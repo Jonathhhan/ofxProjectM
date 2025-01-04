@@ -66,9 +66,11 @@ void ofxProjectM::setPresetDuration(double duration) const {
 }
 
 void ofxProjectM::update() {
+	ofPushStyle();
 	fbo.bind();
 	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
 	fbo.unbind();
+	ofPopStyle();
 }
 
 void ofxProjectM::draw(int x, int y) {
