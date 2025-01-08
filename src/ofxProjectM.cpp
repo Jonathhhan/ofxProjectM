@@ -81,6 +81,10 @@ void ofxProjectM::draw(int x, int y, int a, int b) {
 	fbo.getTexture().draw(x, y, a, b);
 }
 
+ofTexture ofxProjectM::getTexture() {
+	return fbo.getTexture();
+}
+
 void ofxProjectM::bind() {
 	fbo.getTexture().bind();
 }
