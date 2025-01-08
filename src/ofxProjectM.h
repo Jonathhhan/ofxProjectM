@@ -14,6 +14,7 @@ public:
 	void update();
 	void draw(int x, int y);
 	void draw(int x, int y, int a, int b);
+	ofTexture getTexture();
 	void bind();
 	void unbind();
 	void audio(float * buffer, int bufferSize, int channels) const;
