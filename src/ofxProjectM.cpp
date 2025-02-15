@@ -17,10 +17,10 @@ void ofxProjectM::load() {
 	projectm_set_mesh_size(projectMHandle, 32, 32);
 	projectm_set_aspect_correction(projectMHandle, true);
 	projectm_set_fps(projectMHandle, 60);
-	projectm_set_beat_sensitivity(projectMHandle, 0.5);
+	projectm_set_beat_sensitivity(projectMHandle, 1.0);
 	projectm_set_hard_cut_enabled(projectMHandle, true);
-	projectm_set_hard_cut_duration(projectMHandle, 5.0);
-	projectm_set_hard_cut_sensitivity(projectMHandle, 0.5);
+	projectm_set_hard_cut_duration(projectMHandle, 10.0);
+	projectm_set_hard_cut_sensitivity(projectMHandle, 1.0);
 	projectm_set_soft_cut_duration(projectMHandle, 5.0);
 	projectm_set_preset_locked(projectMHandle, false);
 	projectm_set_preset_duration(projectMHandle, 30.0);
