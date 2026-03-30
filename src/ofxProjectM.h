@@ -13,6 +13,7 @@ public:
 	void setTexture(const ofTexture & texture);
 	void clearTexture();
 	void useInternalTextureOnly();
+	void resetTextures() const;
 	void setWindowSize(int x, int y);
 	void setMeshSize(int x, int y) const;
 	void setPresetDuration(double duration) const;

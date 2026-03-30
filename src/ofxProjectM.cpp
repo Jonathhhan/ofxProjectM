@@ -196,6 +196,12 @@ void ofxProjectM::useInternalTextureOnly() {
 	clearTexture();
 }
 
+void ofxProjectM::resetTextures() const {
+	if (projectMHandle) {
+		projectm_reset_textures(projectMHandle);
+	}
+}
+
 void ofxProjectM::textureLoadEvent(const char * texture_name, projectm_texture_load_data * data, void * user_data) {
 	ofxProjectM * that = static_cast<ofxProjectM *>(user_data);
 	(void)texture_name;
