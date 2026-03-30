@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
-#include "../libs/projectM/include/projectM-4/projectM.h"
-#include "../libs/projectM/include/projectM-4/playlist.h"
+#include "projectM-4/projectM.h"
+#include "projectM-4/playlist.h"
 
 
 class ofxProjectM {
