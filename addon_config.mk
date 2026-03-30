@@ -30,7 +30,6 @@ common:
 	# but if the addon or addon libraries need special search paths they can be
 	# specified here separated by spaces or one per line using +=
 	ADDON_INCLUDES += libs/projectM/include
-	ADDON_INCLUDES += libs/projectM/include/projectM-4
 
 	# ADDON_INCLUDES =
 
@@ -79,6 +78,6 @@ linuxarmv7l:
 msys2:
 
 vs:
-	ADDON_LIBS += libs/projectM/vs/libprojectM-4.lib
-	ADDON_LIBS += libs/projectM/vs/libprojectM-4-playlist.lib
+	ADDON_LIBS += libs/projectM/lib/vs/libprojectM-4.lib
+	ADDON_LIBS += libs/projectM/lib/vs/libprojectM-4-playlist.lib
 
