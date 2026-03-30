@@ -29,11 +29,17 @@ common:
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
 	# specified here separated by spaces or one per line using +=
+	ADDON_INCLUDES += libs/projectM/include
+	ADDON_INCLUDES += libs/projectM/include/projectM-4
+
 	# ADDON_INCLUDES =
 
 	# any special flag that should be passed to the compiler when using this
 	# addon
 	# ADDON_CFLAGS =
+	ADDON_CFLAGS += -DPROJECTM_STATIC_DEFINE
+	ADDON_CFLAGS += -DPROJECTM_CXX_STATIC_DEFINE
+	ADDON_CFLAGS += -DPROJECTM_PLAYLIST_STATIC_DEFINE
 
 	# any special flag that should be passed to the linker when using this
 	# addon, also used for system libraries with -lname
@@ -71,3 +77,8 @@ linuxarmv6l:
 linuxarmv7l:
 
 msys2:
+
+vs:
+	ADDON_LIBS += libs/projectM/vs/libprojectM-4.lib
+	ADDON_LIBS += libs/projectM/vs/libprojectM-4-playlist.lib
+
