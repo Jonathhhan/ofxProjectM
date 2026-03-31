@@ -31,3 +31,15 @@ Outputs:
 - `libs/projectM/lib/linux64/libprojectM-4.a`
 - `libs/projectM/lib/linux64/libprojectM-4-playlist.a`
 - `libs/projectM/include/projectM-4`
+
+## Recommended assets
+
+These packs are recommended for Milkdrop content:
+
+- [presets-cream-of-the-crop](https://github.com/projectM-visualizer/presets-cream-of-the-crop)
+- [presets-milkdrop-texture-pack](https://github.com/projectM-visualizer/presets-milkdrop-texture-pack)
+
+Place them like this:
+
+- Presets from `presets-cream-of-the-crop` go in the `presets` folder.
+- Textures from `presets-milkdrop-texture-pack` go in the `textures` folder.
