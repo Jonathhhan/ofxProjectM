@@ -70,6 +70,8 @@ osx:
 ios:
 	
 linux64:
+	ADDON_LIBS += libs/projectM/lib/linux64/libprojectM-4.a
+	ADDON_LIBS += libs/projectM/lib/linux64/libprojectM-4-playlist.a
 
 linuxarmv6l:
 
