@@ -8,6 +8,12 @@
 class ofxProjectM {
 public:
 	~ofxProjectM();
+	static void setLogLevel(ofLogLevel level);
+	static ofLogLevel getLogLevel();
+	static void logVerbose(const std::string & message);
+	static void logError(const std::string & message);
+	static void logWarning(const std::string & message);
+	static void logNotice(const std::string & message);
 	// init() creates the projectM engine, default render target, and preset playlist.
 	void init();
 	void setTexture(const ofTexture & texture);

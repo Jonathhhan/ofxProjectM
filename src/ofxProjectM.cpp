@@ -3,6 +3,9 @@
 #include <algorithm>
 
 namespace {
+constexpr const char * kLogChannel = "ofxProjectM";
+std::atomic<int> gLogLevel { static_cast<int>(OF_LOG_NOTICE) };
+
 void clearAllocatedFbo(ofFbo & fbo) {
 	if (!fbo.isAllocated()) {
 		return;
@@ -11,6 +14,11 @@ void clearAllocatedFbo(ofFbo & fbo) {
 	fbo.begin();
 	ofClear(0, 0, 0, 0);
 	fbo.end();
+}
+
+bool shouldLog(ofLogLevel level) {
+	const ofLogLevel configuredLevel = static_cast<ofLogLevel>(gLogLevel.load());
+	return configuredLevel != OF_LOG_SILENT && level >= configuredLevel;
 }
 }
 
@@ -22,6 +30,38 @@ std::string ofxProjectM::formatPresetName(const char * presetPath) {
 	return ofFilePath::getBaseName(std::string(presetPath));
 }
 
+void ofxProjectM::setLogLevel(ofLogLevel level) {
+	gLogLevel.store(static_cast<int>(level));
+}
+
+ofLogLevel ofxProjectM::getLogLevel() {
+	return static_cast<ofLogLevel>(gLogLevel.load());
+}
+
+void ofxProjectM::logVerbose(const std::string & message) {
+	if (!message.empty() && shouldLog(OF_LOG_VERBOSE)) {
+		ofLogVerbose(kLogChannel) << message;
+	}
+}
+
+void ofxProjectM::logError(const std::string & message) {
+	if (!message.empty() && shouldLog(OF_LOG_ERROR)) {
+		ofLogError(kLogChannel) << message;
+	}
+}
+
+void ofxProjectM::logWarning(const std::string & message) {
+	if (!message.empty() && shouldLog(OF_LOG_WARNING)) {
+		ofLogWarning(kLogChannel) << message;
+	}
+}
+
+void ofxProjectM::logNotice(const std::string & message) {
+	if (!message.empty() && shouldLog(OF_LOG_NOTICE)) {
+		ofLogNotice(kLogChannel) << message;
+	}
+}
+
 void ofxProjectM::setStatus(const std::string & message) {
 	lastStatusMessage = message;
 	lastErrorMessage.clear();
@@ -30,9 +70,7 @@ void ofxProjectM::setStatus(const std::string & message) {
 void ofxProjectM::setError(const std::string & message) {
 	lastErrorMessage = message;
 	lastStatusMessage.clear();
-	if (!message.empty()) {
-		ofLogWarning("ofxProjectM") << message;
-	}
+	logError(message);
 }
 
 void ofxProjectM::clearLastMessages() {
@@ -102,6 +140,7 @@ void ofxProjectM::init() {
 	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
 	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, this);
 	reloadPresets();
+	logNotice("ProjectM initialized.");
 }
 
 void ofxProjectM::reloadPresets() {
@@ -182,6 +221,7 @@ void ofxProjectM::reloadPresets() {
 	}
 
 	setStatus(currentPresetPath.empty() ? "Loaded projectM presets." : "Reloaded projectM presets.");
+	logNotice(currentPresetPath.empty() ? "Presets loaded." : "Presets reloaded.");
 }
 
 void ofxProjectM::setTexture(const ofTexture & tex) {
@@ -234,6 +274,11 @@ void ofxProjectM::presetSwitched(bool hardCut, unsigned int index, void * data) 
 		projectm_playlist_free_string(presetPath);
 	}
 	that->setStatus("Switched projectM preset.");
+	if (!that->presetName.empty()) {
+		that->logNotice("Preset switched: " + that->presetName + ".");
+	} else {
+		that->logNotice("Preset switched.");
+	}
 }
 
 void ofxProjectM::presetSwitchFailed(const char * presetFilename, const char * message, void * data) {
