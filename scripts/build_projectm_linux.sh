@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Downloads the current projectM master checkout into ofxProjectM/_projectm_build,
+# Downloads the current projectM master checkout into a temporary directory,
 # builds the static Linux libraries, and copies the results into the addon's
 # libs/projectM folder structure.
 #
@@ -10,13 +10,14 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADDON_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-PROJECTM_ROOT="${ADDON_ROOT}/_projectm_build"
-BUILD_DIR="${PROJECTM_ROOT}/build-linux-static"
-STAGE_DIR="${PROJECTM_ROOT}/build-linux-stage"
 TARGET_LIB_DIR="${ADDON_ROOT}/libs/projectM/lib/linux64"
 TARGET_INCLUDE_DIR="${ADDON_ROOT}/libs/projectM/include/projectM-4"
 PROJECTM_REPO_URL="https://github.com/projectM-visualizer/projectm.git"
 PROJECTM_REPO_BRANCH="master"
+TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/ofxProjectM.XXXXXXXX")"
+PROJECTM_ROOT="${TEMP_ROOT}/projectm"
+BUILD_DIR="${TEMP_ROOT}/build-linux-static"
+STAGE_DIR="${TEMP_ROOT}/build-linux-stage"
 
 require_command() {
 	local command_name="$1"
@@ -26,15 +27,21 @@ require_command() {
 	fi
 }
 
+cleanup() {
+	echo "==> Cleaning temporary build files"
+	rm -rf "${TEMP_ROOT}"
+}
+
 require_command git
 require_command cmake
+trap cleanup EXIT
+
+echo "==> Using temporary build root: ${TEMP_ROOT}"
 
 echo "==> Fetching current projectM master"
-rm -rf "${PROJECTM_ROOT}"
 git clone --branch "${PROJECTM_REPO_BRANCH}" --depth 1 --recursive "${PROJECTM_REPO_URL}" "${PROJECTM_ROOT}"
 
 echo "==> Configuring Linux static build"
-rm -rf "${BUILD_DIR}"
 cmake -S "${PROJECTM_ROOT}" -B "${BUILD_DIR}" \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBUILD_SHARED_LIBS=OFF \
@@ -70,16 +77,12 @@ fi
 
 echo "==> Copying libs and headers into addon"
 mkdir -p "${TARGET_LIB_DIR}"
-mkdir -p "${TARGET_INCLUDE_DIR}"
 
 cp -f "${MAIN_LIB}" "${TARGET_LIB_DIR}/libprojectM-4.a"
 cp -f "${PLAYLIST_LIB}" "${TARGET_LIB_DIR}/libprojectM-4-playlist.a"
 rm -rf "${TARGET_INCLUDE_DIR}"
 mkdir -p "${TARGET_INCLUDE_DIR}"
 cp -a "${INSTALLED_INCLUDE_DIR}/." "${TARGET_INCLUDE_DIR}/"
-
-echo "==> Cleaning temporary build files"
-rm -rf "${PROJECTM_ROOT}"
 
 echo "==> Done"
 echo "Copied:"
