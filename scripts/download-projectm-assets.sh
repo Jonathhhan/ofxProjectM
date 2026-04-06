@@ -63,13 +63,14 @@ Usage:
   bash scripts/download-projectm-assets.sh [options]
 
 Options:
-  --presets                   Download the preset pack
-  --textures                  Download the texture pack
+  --presets                   Download the Cream of the Crop preset pack
+  --textures                  Download the full Milkdrop texture pack
   --example NAME              Limit install to one example
                               Supported: ofxProjectMExample, ofxProjectMSimpleVlcExample
   --keep-temp                 Keep the temporary clone directory
 
 Examples:
+  bash scripts/download-projectm-assets.sh
   bash scripts/download-projectm-assets.sh --presets
   bash scripts/download-projectm-assets.sh --textures
   bash scripts/download-projectm-assets.sh --presets --textures --example ofxProjectMSimpleVlcExample
@@ -105,10 +106,6 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-if [[ "$DOWNLOAD_PRESETS" -eq 0 && "$DOWNLOAD_TEXTURES" -eq 0 ]]; then
-	die "Nothing selected. Pass --presets, --textures, or both."
-fi
-
 if [[ -n "$TARGET_EXAMPLE" && "$TARGET_EXAMPLE" != "ofxProjectMExample" && "$TARGET_EXAMPLE" != "ofxProjectMSimpleVlcExample" ]]; then
 	die "Unsupported example '$TARGET_EXAMPLE'."
 fi
@@ -131,13 +128,19 @@ trap cleanup EXIT
 
 write_step "Using temporary download root: ${TEMP_ROOT}"
 
+if [[ "$DOWNLOAD_PRESETS" -eq 0 && "$DOWNLOAD_TEXTURES" -eq 0 ]]; then
+	DOWNLOAD_PRESETS=1
+	DOWNLOAD_TEXTURES=1
+	write_step "No asset selection provided, downloading the full preset and texture packs"
+fi
+
 if [[ "$DOWNLOAD_PRESETS" -eq 1 ]]; then
-	write_step "Cloning recommended preset pack"
+	write_step "Cloning Cream of the Crop preset pack"
 	git clone --depth 1 "$PRESETS_REPO_URL" "$PRESETS_CLONE_DIR"
 fi
 
 if [[ "$DOWNLOAD_TEXTURES" -eq 1 ]]; then
-	write_step "Cloning recommended texture pack"
+	write_step "Cloning full Milkdrop texture pack"
 	git clone --depth 1 "$TEXTURES_REPO_URL" "$TEXTURES_CLONE_DIR"
 fi
 

@@ -24,8 +24,7 @@ For a useful `projectM` result, place preset and texture packs in:
 Quick setup:
 
 ```bash
-bash ../scripts/download-projectm-assets.sh --presets --example ofxProjectMExample
-bash ../scripts/download-projectm-assets.sh --textures --example ofxProjectMExample
+bash ../scripts/download-projectm-assets.sh --example ofxProjectMExample
 ```
 
 ## Controls

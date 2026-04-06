@@ -153,25 +153,24 @@ If you are running inside WSL and want Linux artifacts instead of the default Wi
 bash scripts/build_projectm.sh --target linux
 ```
 
-## Recommended assets
+## Runtime assets
 
-These packs are recommended for Milkdrop content:
+The addon helper downloads the Cream of the Crop preset pack and the full texture pack:
 
 - [presets-cream-of-the-crop](https://github.com/projectM-visualizer/presets-cream-of-the-crop)
 - [presets-milkdrop-texture-pack](https://github.com/projectM-visualizer/presets-milkdrop-texture-pack)
 
-The addon now ships a helper script for these:
+By default it installs both:
 
 ```bash
-bash scripts/download-projectm-assets.sh --presets
-bash scripts/download-projectm-assets.sh --textures
+bash scripts/download-projectm-assets.sh
 ```
 
 Useful variants:
 
 ```bash
-bash scripts/download-projectm-assets.sh --presets --textures
-bash scripts/download-projectm-assets.sh --presets --example ofxProjectMSimpleVlcExample
+bash scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
+bash scripts/download-projectm-assets.sh --presets
 bash scripts/download-projectm-assets.sh --textures --example ofxProjectMSimpleVlcExample
 ```
 

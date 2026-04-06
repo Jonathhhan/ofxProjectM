@@ -22,7 +22,7 @@ For a useful `projectM` result, place preset and texture packs in:
 - `bin/data/presets`
 - `bin/data/textures`
 
-The recommended packs are the same ones listed in the main addon README:
+The full packs are the same ones listed in the main addon README:
 
 - `presets-cream-of-the-crop`
 - `presets-milkdrop-texture-pack`
@@ -30,8 +30,7 @@ The recommended packs are the same ones listed in the main addon README:
 Quick setup:
 
 ```bash
-bash ../scripts/download-projectm-assets.sh --presets --example ofxProjectMSimpleVlcExample
-bash ../scripts/download-projectm-assets.sh --textures --example ofxProjectMSimpleVlcExample
+bash ../scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
 ```
 
 Optional media seed files can be placed in `bin/data` as:
