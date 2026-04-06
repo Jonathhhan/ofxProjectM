@@ -17,3 +17,9 @@ ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.vcxproj.filters
 # Locally built projectM outputs
 libs/projectM/include/projectM-4/
 libs/projectM/lib/vs/
+
+# Generated ofxProjectMExample Visual Studio project files
+ofxProjectMExample/icon.rc
+ofxProjectMExample/ofxProjectMExample.sln
+ofxProjectMExample/ofxProjectMExample.vcxproj
+ofxProjectMExample/ofxProjectMExample.vcxproj.filters

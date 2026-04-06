@@ -20,7 +20,6 @@ meta:
 	ADDON_AUTHOR = Jonathan Frank
 	ADDON_TAGS = "projectM"
 	ADDON_URL = https://github.com/Jonathhhan/ofxProjectM
-	ADDON_VERSION = 1.0.1
 
 common:
 	# dependencies with other addons, a list of them separated by spaces
