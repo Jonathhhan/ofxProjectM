@@ -203,7 +203,7 @@ void ofApp::keyPressed(int key) {
 	}
 
 	if (key == ' ') {
-		if (!player.getPlaylist().empty()) {
+		if (player.hasPlaylist()) {
 			if (player.isPlaying()) {
 				player.pause();
 			} else {
@@ -253,11 +253,14 @@ void ofApp::updateProjectMWindowSize() {
 }
 
 std::string ofApp::mediaStatusLabel() const {
-	if (player.getPlaylist().empty()) {
+	if (!player.hasPlaylist()) {
 		return "Drop a file, press O, or place movie.mp4 in bin/data.";
 	}
 
-	std::string label = ofFilePath::getBaseName(player.getPathAtIndex(0));
+	const auto currentItem = player.getCurrentPlaylistItemInfo();
+	std::string label = currentItem.path.empty()
+		? "Loaded media"
+		: ofFilePath::getBaseName(currentItem.path);
 	const ofxVlc4::PlaybackStateInfo playbackState = player.getPlaybackStateInfo();
 	if (playbackState.playing) {
 		label += " [playing]";
