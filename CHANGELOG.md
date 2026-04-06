@@ -13,6 +13,7 @@ Highlights:
   - `ofxProjectMSimpleVlcExample`
 - normalized the VLC bridge example onto the current `ofxVlc4` addon name instead of the compatibility alias
 - refreshed example documentation to match the current controls and setup flow
+- cleaned `libs/projectM` back to placeholder directories so the build script is the source of truth for generated headers and libraries
 
 ## 1.0.0
 

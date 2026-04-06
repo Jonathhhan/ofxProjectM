@@ -70,9 +70,11 @@ Small internal helper headers:
 - `src/ofxProjectMPlaylist.h`
 - `src/ofxProjectMRender.h`
 
-## Rebuilding bundled projectM libraries
+## Building projectM libraries
 
-The unified shell script clones and builds `projectM` in a temporary directory outside the addon tree, then copies only the finished libraries and headers back into `libs/projectM`. This avoids broken working trees when the addon lives inside a OneDrive-synced folder.
+The unified shell script clones and builds `projectM` in a temporary directory outside the addon tree, then copies only the finished libraries and headers back into `libs/projectM`.
+
+The repository keeps `libs/projectM` as placeholder directories only. Run the build script after cloning if you want the local static libraries and headers populated.
 
 If you want one entry point across platforms, use:
 
