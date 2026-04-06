@@ -1,5 +1,6 @@
 .vs/
 **/bin/
+**/dll/
 **/obj/
 **/build/
 *.user
