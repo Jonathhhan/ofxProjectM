@@ -22,6 +22,8 @@ For a useful `projectM` result, place preset and texture packs in:
 - `bin/data/presets`
 - `bin/data/textures`
 
+If you package your own standalone app, copy the preset and texture folders you need into that app's `bin/data`.
+
 The full packs are the same ones listed in the main addon README:
 
 - `presets-cream-of-the-crop`
