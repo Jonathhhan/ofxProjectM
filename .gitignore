@@ -1,0 +1,19 @@
+.vs/
+**/bin/
+**/obj/
+**/build/
+*.user
+*.suo
+*.opensdf
+*.vcxproj.user
+*.tmp
+
+# Generated Visual Studio project files
+ofxProjectMSimpleVlcExample/icon.rc
+ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.sln
+ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.vcxproj
+ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.vcxproj.filters
+
+# Locally built projectM outputs
+libs/projectM/include/projectM-4/
+libs/projectM/lib/vs/
