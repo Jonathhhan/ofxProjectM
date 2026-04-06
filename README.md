@@ -87,6 +87,7 @@ The wrapper dispatches to:
 - macOS: native static build into `libs/projectM/lib/osx`
 - Linux: native static build into `libs/projectM/lib/linux64`
 - Git Bash / MSYS / Cygwin on Windows: embedded PowerShell build into `libs/projectM/lib/vs`
+- WSL: auto-detected as Windows by default so a Windows checkout still fills `libs/projectM/lib/vs`
 
 ### Windows
 
@@ -97,6 +98,7 @@ bash scripts/build_projectm.sh
 ```
 
 This builds both `Debug` and `Release` by default on Windows.
+WSL now follows this Windows path automatically unless you override it.
 If you only want one configuration, use for example:
 
 ```bash
@@ -144,6 +146,12 @@ Outputs:
 - `libs/projectM/lib/linux64/libprojectM-4.a`
 - `libs/projectM/lib/linux64/libprojectM-4-playlist.a`
 - `libs/projectM/include/projectM-4`
+
+If you are running inside WSL and want Linux artifacts instead of the default Windows/Visual Studio path, use:
+
+```bash
+bash scripts/build_projectm.sh --target linux
+```
 
 ## Recommended assets
 

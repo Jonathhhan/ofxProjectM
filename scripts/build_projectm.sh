@@ -8,6 +8,7 @@ PROJECTM_REPO_BRANCH="master"
 WINDOWS_GENERATOR="Visual Studio 18 2026"
 WINDOWS_PLATFORM="x64"
 WINDOWS_CONFIGURATION=""
+BUILD_TARGET="${BUILD_TARGET:-auto}"
 OSX_ARCHITECTURES="${OSX_ARCHITECTURES:-arm64;x86_64}"
 OSX_DEPLOYMENT_TARGET="${OSX_DEPLOYMENT_TARGET:-}"
 
@@ -24,6 +25,52 @@ require_command() {
 	if ! command -v "$1" >/dev/null 2>&1; then
 		die "Required command not found: $1"
 	fi
+}
+
+is_wsl() {
+	if [[ -n "${WSL_INTEROP:-}" || -n "${WSL_DISTRO_NAME:-}" ]]; then
+		return 0
+	fi
+
+	if [[ -r /proc/sys/kernel/osrelease ]] && grep -qi 'microsoft' /proc/sys/kernel/osrelease; then
+		return 0
+	fi
+
+	return 1
+}
+
+resolve_build_target() {
+	local uname_s
+	uname_s="$(uname -s)"
+
+	case "${BUILD_TARGET}" in
+		auto)
+			case "${uname_s}" in
+				Darwin)
+					printf '%s\n' "macos"
+					;;
+				Linux)
+					if is_wsl; then
+						printf '%s\n' "windows"
+					else
+						printf '%s\n' "linux"
+					fi
+					;;
+				MINGW*|MSYS*|CYGWIN*)
+					printf '%s\n' "windows"
+					;;
+				*)
+					printf '%s\n' "unsupported"
+					;;
+			esac
+			;;
+		windows|linux|macos)
+			printf '%s\n' "${BUILD_TARGET}"
+			;;
+		*)
+			die "Unknown target '${BUILD_TARGET}'. Supported values: auto, windows, linux, macos"
+			;;
+	esac
 }
 
 to_windows_path() {
@@ -255,6 +302,10 @@ EOF
 
 while [[ $# -gt 0 ]]; do
 	case "$1" in
+		--target)
+			BUILD_TARGET="${2:-}"
+			shift 2
+			;;
 		--generator)
 			WINDOWS_GENERATOR="${2:-}"
 			shift 2
@@ -273,8 +324,14 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-case "$(uname -s)" in
-	Darwin)
+SELECTED_BUILD_TARGET="$(resolve_build_target)"
+
+if [[ "${BUILD_TARGET}" == "auto" && "${SELECTED_BUILD_TARGET}" == "windows" ]] && is_wsl; then
+	write_step "Detected WSL; using the Windows/Visual Studio build path. Pass --target linux to force Linux output."
+fi
+
+case "${SELECTED_BUILD_TARGET}" in
+	macos)
 		mac_cmake_args=(
 			-DCMAKE_BUILD_TYPE=Release
 			-DCMAKE_OSX_ARCHITECTURES="${OSX_ARCHITECTURES}"
@@ -292,7 +349,7 @@ case "$(uname -s)" in
 			"build-macos-stage" \
 			"${mac_cmake_args[@]}"
 		;;
-	Linux)
+	linux)
 		run_unix_build \
 			"${ADDON_ROOT}/libs/projectM/lib/linux64" \
 			"build-linux-static" \
@@ -303,10 +360,10 @@ case "$(uname -s)" in
 			-DENABLE_SDL_UI=OFF \
 			-DENABLE_INSTALL=ON
 		;;
-	MINGW*|MSYS*|CYGWIN*)
+	windows)
 		run_windows_build
 		;;
 	*)
-		die "Unsupported platform: $(uname -s)"
+		die "Unsupported platform/target combination: $(uname -s) / ${SELECTED_BUILD_TARGET}"
 		;;
 esac
