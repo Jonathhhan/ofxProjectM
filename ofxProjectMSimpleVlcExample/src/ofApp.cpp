@@ -129,7 +129,7 @@ void ofApp::draw() {
 		ImGui::Text("Texture source: %s", projectMTextureModeLabel().c_str());
 
 		if (ImGui::Button("Open Media")) {
-			const ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
+			ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
 			if (result.bSuccess) {
 				loadMedia(result.getPath(), true);
 			}
@@ -195,7 +195,7 @@ void ofApp::audioOut(ofSoundBuffer & buffer) {
 
 void ofApp::keyPressed(int key) {
 	if (key == 'o' || key == 'O') {
-		const ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
+		ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
 		if (result.bSuccess) {
 			loadMedia(result.getPath(), true);
 		}
