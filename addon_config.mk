@@ -20,6 +20,7 @@ meta:
 	ADDON_AUTHOR = Jonathan Frank
 	ADDON_TAGS = "projectM"
 	ADDON_URL = https://github.com/Jonathhhan/ofxProjectM
+	ADDON_VERSION = 1.0.1
 
 common:
 	# dependencies with other addons, a list of them separated by spaces
@@ -66,6 +67,8 @@ common:
 	# ADDON_LIBS_EXCLUDE =
 	
 osx:
+	ADDON_LIBS += libs/projectM/lib/osx/libprojectM-4.a
+	ADDON_LIBS += libs/projectM/lib/osx/libprojectM-4-playlist.a
 
 ios:
 	
@@ -80,6 +83,6 @@ linuxarmv7l:
 msys2:
 
 vs:
-	ADDON_LIBS += libs/projectM/lib/vs/libprojectM-4.lib
-	ADDON_LIBS += libs/projectM/lib/vs/libprojectM-4-playlist.lib
+	ADDON_LIBS += libs/projectM/lib/vs/$(Configuration)/libprojectM-4.lib
+	ADDON_LIBS += libs/projectM/lib/vs/$(Configuration)/libprojectM-4-playlist.lib
 

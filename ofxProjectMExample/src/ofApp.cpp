@@ -3,10 +3,13 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofBackground(34, 34, 34);
+	ofSetWindowTitle("ofxProjectMExample");
 	ofDisableArbTex();
 	cam.setPosition(0, 0, 200);
-	projectM.load();
 	projectM.setWindowSize(1024, 1024);
+	projectM.init();
+	gui.setup(nullptr, true, ImGuiConfigFlags_None, true);
+	ImGui::GetIO().IniFilename = "imgui_projectm.ini";
 	std::cout << "Max samples: " << projectM.getMaxSamples() << std::endl;
 
 	bufferSize = 512;
@@ -74,10 +77,6 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofSetColor(225);
-	ofDrawBitmapString("PROJECTM EXAMPLE", 32, 32);
-	ofDrawBitmapString("press 's' to unpause the audio\npress 'e' to pause the audio", 31, 92);
-	
 	ofNoFill();
 	
 	// draw the left channel:
@@ -136,9 +135,54 @@ void ofApp::draw(){
 	ofDisableDepthTest();
 	projectM.unbind();
 	cam.end();
-		
-	ofSetColor(225);
-	ofDrawBitmapString(projectM.getPresetName(), 32, 700);
+
+	gui.begin();
+	ImGui::SetNextWindowPos(ImVec2(20.0f, 20.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(340.0f, 260.0f), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("ProjectM Controls")) {
+		ImGui::TextWrapped("Standalone projectM example with generated audio driving the visuals.");
+		ImGui::Separator();
+		ImGui::Text("Preset: %s", projectM.getPresetName().c_str());
+		ImGui::Text("Audio stream: %s", audioRunning ? "running" : "stopped");
+		ImGui::Text("Buffer: %d  Sample rate: %d", bufferSize, sampleRate);
+
+		if (ImGui::Button("Previous Preset")) {
+			projectM.previousPreset();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Next Preset")) {
+			projectM.nextPreset();
+		}
+		if (ImGui::Button("Random Preset")) {
+			projectM.randomPreset();
+		}
+
+		if (audioRunning) {
+			if (ImGui::Button("Stop Audio")) {
+				soundStream.stop();
+				audioRunning = false;
+			}
+		} else {
+			if (ImGui::Button("Start Audio")) {
+				soundStream.start();
+				audioRunning = true;
+			}
+		}
+
+		ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+		ImGui::SliderFloat("Pan", &pan, 0.0f, 1.0f);
+		ImGui::Checkbox("Noise", &bNoise);
+		ImGui::Text("Target frequency: %.1f Hz", targetFrequency);
+		ImGui::TextWrapped("Keyboard fallback: S start audio, E stop audio, +/- volume, any other key randomizes the preset.");
+	}
+	ImGui::End();
+	gui.end();
+}
+
+//--------------------------------------------------------------
+void ofApp::exit() {
+	soundStream.close();
+	gui.exit();
 }
 
 //--------------------------------------------------------------
@@ -153,10 +197,12 @@ void ofApp::keyPressed  (int key){
 	
 	if( key == 's' ){
 		soundStream.start();
+		audioRunning = true;
 	}
 	
 	if( key == 'e' ){
 		soundStream.stop();
+		audioRunning = false;
 	}
 	projectM.randomPreset();
 }

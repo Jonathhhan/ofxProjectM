@@ -1,41 +1,205 @@
-#include "ofxProjectM.h"
+﻿#include "ofxProjectM.h"
+#include "ofxProjectMPlaylist.h"
+#include "ofxProjectMRender.h"
 
 #include <algorithm>
+#include <atomic>
+#include <vector>
 
 namespace {
 constexpr const char * kLogChannel = "ofxProjectM";
+constexpr int kOfxProjectMAddonVersionMajor = 1;
+constexpr int kOfxProjectMAddonVersionMinor = 0;
+constexpr int kOfxProjectMAddonVersionPatch = 0;
+constexpr const char * kOfxProjectMAddonVersionString = "1.0.1";
 std::atomic<int> gLogLevel { static_cast<int>(OF_LOG_NOTICE) };
-
-void clearAllocatedFbo(ofFbo & fbo) {
-	if (!fbo.isAllocated()) {
-		return;
-	}
-
-	fbo.begin();
-	ofClear(0, 0, 0, 0);
-	fbo.end();
-}
+std::atomic<int> gProjectMRuntimeLogLevel { static_cast<int>(PROJECTM_LOG_LEVEL_INFO) };
+std::atomic<bool> gProjectMRuntimeLogCallbackEnabled { true };
+std::atomic<bool> gProjectMRuntimeLogCurrentThreadOnly { true };
 
 bool shouldLog(ofLogLevel level) {
 	const ofLogLevel configuredLevel = static_cast<ofLogLevel>(gLogLevel.load());
 	return configuredLevel != OF_LOG_SILENT && level >= configuredLevel;
 }
-}
 
-std::string ofxProjectM::formatPresetName(const char * presetPath) {
-	if (!presetPath) {
-		return "";
+void destroyProjectMHandle(projectm_handle & projectMHandle) {
+	if (!projectMHandle) {
+		return;
 	}
 
-	return ofFilePath::getBaseName(std::string(presetPath));
+	projectm_destroy(projectMHandle);
+	projectMHandle = nullptr;
+}
+
+}
+
+ofxProjectMAddonVersionInfo ofxProjectM::getAddonVersionInfo() {
+	return {
+		kOfxProjectMAddonVersionMajor,
+		kOfxProjectMAddonVersionMinor,
+		kOfxProjectMAddonVersionPatch,
+		kOfxProjectMAddonVersionString
+	};
+}
+
+void ofxProjectM::applyRuntimeParameters() const {
+	if (!projectMHandle) {
+		return;
+	}
+
+	projectm_set_window_size(projectMHandle, static_cast<size_t>(windowWidth), static_cast<size_t>(windowHeight));
+	projectm_set_mesh_size(projectMHandle, static_cast<size_t>(meshWidth), static_cast<size_t>(meshHeight));
+	projectm_set_aspect_correction(projectMHandle, aspectCorrectionEnabled);
+	projectm_set_fps(projectMHandle, fps);
+	projectm_set_beat_sensitivity(projectMHandle, beatSensitivity);
+	projectm_set_hard_cut_enabled(projectMHandle, hardCutEnabled);
+	projectm_set_hard_cut_duration(projectMHandle, hardCutDuration);
+	projectm_set_hard_cut_sensitivity(projectMHandle, hardCutSensitivity);
+	projectm_set_soft_cut_duration(projectMHandle, softCutDuration);
+	projectm_set_preset_locked(projectMHandle, presetLocked);
+	projectm_set_preset_duration(projectMHandle, presetDuration);
+	projectm_set_frame_time(projectMHandle, frameTime);
+	projectm_set_preset_start_clean(projectMHandle, presetStartClean);
+	projectm_set_easter_egg(projectMHandle, easterEgg);
+	projectm_set_texel_offset(projectMHandle, texelOffsetX, texelOffsetY);
+}
+
+void ofxProjectM::connectProjectMCallbacks() const {
+	if (!projectMHandle) {
+		return;
+	}
+
+	auto * self = const_cast<ofxProjectM *>(this);
+	projectm_set_texture_load_event_callback(projectMHandle, textureLoadEvent, self);
+	projectm_set_preset_switch_failed_event_callback(projectMHandle, presetSwitchFailed, self);
+	if (!projectMPlaylistHandle) {
+		projectm_set_preset_switch_requested_event_callback(
+			projectMHandle,
+			presetSwitchRequestedCallback ? presetSwitchRequested : nullptr,
+			self);
+	}
 }
 
 void ofxProjectM::setLogLevel(ofLogLevel level) {
 	gLogLevel.store(static_cast<int>(level));
+	setProjectMRuntimeLogLevel(toProjectMRuntimeLogLevel(level), gProjectMRuntimeLogCurrentThreadOnly.load());
 }
 
 ofLogLevel ofxProjectM::getLogLevel() {
 	return static_cast<ofLogLevel>(gLogLevel.load());
+}
+
+projectm_log_level ofxProjectM::toProjectMRuntimeLogLevel(ofLogLevel level) {
+	switch (level) {
+	case OF_LOG_VERBOSE:
+		return PROJECTM_LOG_LEVEL_TRACE;
+	case OF_LOG_NOTICE:
+		return PROJECTM_LOG_LEVEL_INFO;
+	case OF_LOG_WARNING:
+		return PROJECTM_LOG_LEVEL_WARN;
+	case OF_LOG_ERROR:
+		return PROJECTM_LOG_LEVEL_ERROR;
+	case OF_LOG_FATAL_ERROR:
+		return PROJECTM_LOG_LEVEL_FATAL;
+	case OF_LOG_SILENT:
+		return PROJECTM_LOG_LEVEL_FATAL;
+	default:
+		return PROJECTM_LOG_LEVEL_DEBUG;
+	}
+}
+
+ofLogLevel ofxProjectM::toOfLogLevel(projectm_log_level level) {
+	switch (level) {
+	case PROJECTM_LOG_LEVEL_TRACE:
+	case PROJECTM_LOG_LEVEL_DEBUG:
+		return OF_LOG_VERBOSE;
+	case PROJECTM_LOG_LEVEL_INFO:
+		return OF_LOG_NOTICE;
+	case PROJECTM_LOG_LEVEL_WARN:
+		return OF_LOG_WARNING;
+	case PROJECTM_LOG_LEVEL_ERROR:
+		return OF_LOG_ERROR;
+	case PROJECTM_LOG_LEVEL_FATAL:
+		return OF_LOG_FATAL_ERROR;
+	case PROJECTM_LOG_LEVEL_NOTSET:
+	default:
+		return OF_LOG_NOTICE;
+	}
+}
+
+std::vector<const char *> ofxProjectM::makeCStringView(const std::vector<std::string> & values) {
+	std::vector<const char *> out;
+	out.reserve(values.size());
+	for (const auto & value : values) {
+		out.push_back(value.c_str());
+	}
+	return out;
+}
+
+void ofxProjectM::projectMLogCallback(const char * message, projectm_log_level logLevel, void * userData) {
+	(void)userData;
+	if (!message || *message == '\0') {
+		return;
+	}
+
+	switch (toOfLogLevel(logLevel)) {
+	case OF_LOG_VERBOSE:
+		logVerbose(message);
+		break;
+	case OF_LOG_WARNING:
+		logWarning(message);
+		break;
+	case OF_LOG_ERROR:
+	case OF_LOG_FATAL_ERROR:
+		logError(message);
+		break;
+	case OF_LOG_NOTICE:
+	default:
+		logNotice(message);
+		break;
+	}
+}
+
+void ofxProjectM::setProjectMRuntimeLogLevel(projectm_log_level level, bool currentThreadOnly) {
+	gProjectMRuntimeLogLevel.store(static_cast<int>(level));
+	gProjectMRuntimeLogCurrentThreadOnly.store(currentThreadOnly);
+	projectm_set_log_level(level, currentThreadOnly);
+}
+
+projectm_log_level ofxProjectM::getProjectMRuntimeLogLevel() {
+	return static_cast<projectm_log_level>(gProjectMRuntimeLogLevel.load());
+}
+
+void ofxProjectM::setProjectMRuntimeLogCallbackEnabled(bool enabled, bool currentThreadOnly) {
+	gProjectMRuntimeLogCallbackEnabled.store(enabled);
+	gProjectMRuntimeLogCurrentThreadOnly.store(currentThreadOnly);
+	projectm_set_log_callback(enabled ? projectMLogCallback : nullptr, currentThreadOnly, nullptr);
+	if (enabled) {
+		projectm_set_log_level(getProjectMRuntimeLogLevel(), currentThreadOnly);
+	}
+}
+
+bool ofxProjectM::isProjectMRuntimeLogCallbackEnabled() {
+	return gProjectMRuntimeLogCallbackEnabled.load();
+}
+
+ofxProjectMVersionInfo ofxProjectM::getVersionInfo() {
+	ofxProjectMVersionInfo info;
+	projectm_get_version_components(&info.major, &info.minor, &info.patch);
+
+	char * versionString = projectm_get_version_string();
+	if (versionString) {
+		info.versionString = versionString;
+		projectm_free_string(versionString);
+	}
+
+	char * vcsVersionString = projectm_get_vcs_version_string();
+	if (vcsVersionString) {
+		info.vcsVersionString = vcsVersionString;
+		projectm_free_string(vcsVersionString);
+	}
+
+	return info;
 }
 
 void ofxProjectM::logVerbose(const std::string & message) {
@@ -79,32 +243,19 @@ void ofxProjectM::clearLastMessages() {
 }
 
 ofxProjectM::~ofxProjectM() {
-	if (projectMPlaylistHandle) {
-		projectm_playlist_destroy(projectMPlaylistHandle);
-		projectMPlaylistHandle = nullptr;
-	}
-	if (projectMHandle) {
-		projectm_destroy(projectMHandle);
-		projectMHandle = nullptr;
-	}
+	ofxProjectMPlaylistInternal::destroyPlaylistHandle(projectMPlaylistHandle);
+	destroyProjectMHandle(projectMHandle);
 }
 
 void ofxProjectM::init() {
 	ofSetRandomSeed(ofGetSystemTimeMillis());
 	clearLastMessages();
 
-	// Re-init tears down the previous engine first so callbacks never point at stale handles.
-	if (projectMPlaylistHandle) {
-		projectm_playlist_destroy(projectMPlaylistHandle);
-		projectMPlaylistHandle = nullptr;
-	}
-	if (projectMHandle) {
-		projectm_destroy(projectMHandle);
-		projectMHandle = nullptr;
-	}
+	ofxProjectMPlaylistInternal::destroyPlaylistHandle(projectMPlaylistHandle);
+	destroyProjectMHandle(projectMHandle);
 
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
-	clearAllocatedFbo(fbo);
+	ofxProjectMRenderInternal::clearAllocatedFbo(fbo);
 
 	projectMHandle = projectm_create();
 	if (!projectMHandle) {
@@ -113,319 +264,251 @@ void ofxProjectM::init() {
 		return;
 	}
 
+	projectm_set_log_callback(
+		isProjectMRuntimeLogCallbackEnabled() ? projectMLogCallback : nullptr,
+		gProjectMRuntimeLogCurrentThreadOnly.load(),
+		nullptr);
+	projectm_set_log_level(getProjectMRuntimeLogLevel(), gProjectMRuntimeLogCurrentThreadOnly.load());
+
 	projectMPlaylistHandle = projectm_playlist_create(projectMHandle);
 	if (!projectMPlaylistHandle) {
 		setError("projectM_playlist_create failed");
-		projectm_destroy(projectMHandle);
-		projectMHandle = nullptr;
+		destroyProjectMHandle(projectMHandle);
 		presetName.clear();
 		return;
 	}
 
-	projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
-	projectm_set_mesh_size(projectMHandle, 32, 32);
-	projectm_set_aspect_correction(projectMHandle, true);
-	projectm_set_fps(projectMHandle, 60);
-	projectm_set_beat_sensitivity(projectMHandle, 1.0);
-	projectm_set_hard_cut_enabled(projectMHandle, true);
-	projectm_set_hard_cut_duration(projectMHandle, 10.0);
-	projectm_set_hard_cut_sensitivity(projectMHandle, 1.0);
-	projectm_set_soft_cut_duration(projectMHandle, 5.0);
-	projectm_set_preset_locked(projectMHandle, false);
-	projectm_set_preset_duration(projectMHandle, 30.0);
-	const std::string textureSearchPath = ofToDataPath("textures", true);
-	std::vector<const char *> textures = { textureSearchPath.c_str() };
-	projectm_set_texture_search_paths(projectMHandle, textures.data(), 1);
-	projectm_set_texture_load_event_callback(projectMHandle, textureLoadEvent, this);
-	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
-	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, this);
+	applyRuntimeParameters();
+	if (textureSearchPaths.empty()) {
+		textureSearchPaths = { ofToDataPath("textures", true) };
+	}
+	auto texturePaths = makeCStringView(textureSearchPaths);
+	projectm_set_texture_search_paths(
+		projectMHandle,
+		ofxProjectMPlaylistInternal::projectMCStringArrayData(texturePaths),
+		texturePaths.size());
+	connectProjectMCallbacks();
+	connectPlaylistCallbacks();
+	applyPlaylistParameters();
 	reloadPresets();
 	logNotice("ProjectM initialized.");
 }
 
-void ofxProjectM::reloadPresets() {
-	clearLastMessages();
-
-	if (!projectMHandle) {
-		setError("Cannot reload presets before projectM is initialized.");
-		presetName.clear();
+void ofxProjectM::setMeshSize(int x, int y) {
+	const int clampedWidth = std::max(1, x);
+	const int clampedHeight = std::max(1, y);
+	if (clampedWidth == meshWidth && clampedHeight == meshHeight) {
 		return;
 	}
 
-	std::string currentPresetPath;
-	uint32_t previousPosition = 0;
-	if (projectMPlaylistHandle) {
-		const auto previousPresetCount = projectm_playlist_size(projectMPlaylistHandle);
-		if (previousPresetCount > 0) {
-			previousPosition = projectm_playlist_get_position(projectMPlaylistHandle);
-			char * currentItem = projectm_playlist_item(projectMPlaylistHandle, previousPosition);
-			if (currentItem) {
-				currentPresetPath = currentItem;
-				projectm_playlist_free_string(currentItem);
-			}
-		}
-
-		projectm_playlist_destroy(projectMPlaylistHandle);
-		projectMPlaylistHandle = nullptr;
-	}
-
-	projectMPlaylistHandle = projectm_playlist_create(projectMHandle);
-	if (!projectMPlaylistHandle) {
-		setError("projectM_playlist_create failed");
-		presetName.clear();
-		return;
-	}
-
-	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
-	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, this);
-
-	const std::string presetPath = ofToDataPath("presets", true);
-	projectm_playlist_add_path(projectMPlaylistHandle, presetPath.c_str(), true, false);
-	projectm_playlist_set_retry_count(projectMPlaylistHandle, 0);
-	projectm_playlist_set_shuffle(projectMPlaylistHandle, true);
-
-	const auto presetCount = projectm_playlist_size(projectMPlaylistHandle);
-	if (presetCount == 0) {
-		presetName = "No presets loaded";
-		setStatus("No projectM presets loaded.");
-		return;
-	}
-	projectm_playlist_sort(projectMPlaylistHandle, 0, presetCount, SORT_PREDICATE_FILENAME_ONLY, SORT_ORDER_ASCENDING);
-
-	uint32_t targetPosition =
-		!currentPresetPath.empty() ? std::min(previousPosition, presetCount - 1) : static_cast<uint32_t>(ofRandom(0, presetCount));
-	if (!currentPresetPath.empty()) {
-		for (uint32_t index = 0; index < presetCount; ++index) {
-			char * candidateItem = projectm_playlist_item(projectMPlaylistHandle, index);
-			if (!candidateItem) {
-				continue;
-			}
-
-			const bool isMatch = currentPresetPath == candidateItem;
-			projectm_playlist_free_string(candidateItem);
-			if (isMatch) {
-				targetPosition = index;
-				break;
-			}
-		}
-	}
-
-	projectm_playlist_set_position(projectMPlaylistHandle, targetPosition, true);
-
-	char * activeItem = projectm_playlist_item(projectMPlaylistHandle, projectm_playlist_get_position(projectMPlaylistHandle));
-	if (activeItem) {
-		presetName = formatPresetName(activeItem);
-		projectm_playlist_free_string(activeItem);
-	} else {
-		presetName = "No presets loaded";
-	}
-
-	setStatus(currentPresetPath.empty() ? "Loaded projectM presets." : "Reloaded projectM presets.");
-	logNotice(currentPresetPath.empty() ? "Presets loaded." : "Presets reloaded.");
-}
-
-void ofxProjectM::setTexture(const ofTexture & tex) {
-	texture = tex;
-}
-
-void ofxProjectM::clearTexture() {
-	texture.clear();
-}
-
-void ofxProjectM::useInternalTextureOnly() {
-	clearTexture();
-}
-
-void ofxProjectM::resetTextures() const {
+	meshWidth = clampedWidth;
+	meshHeight = clampedHeight;
 	if (projectMHandle) {
-		projectm_reset_textures(projectMHandle);
+		projectm_set_mesh_size(projectMHandle, static_cast<size_t>(meshWidth), static_cast<size_t>(meshHeight));
 	}
 }
 
-void ofxProjectM::textureLoadEvent(const char * texture_name, projectm_texture_load_data * data, void * user_data) {
-	ofxProjectM * that = static_cast<ofxProjectM *>(user_data);
-	(void)texture_name;
-	if (!that || !data) {
-		return;
-	}
-
-	if (!that->texture.isAllocated()) {
-		data->data = nullptr;
-		data->width = 0;
-		data->height = 0;
-		data->texture_id = 0;
-		return;
-	}
-
-	data->texture_id = that->texture.getTextureData().textureID;
-	data->width = that->texture.getWidth();
-	data->height = that->texture.getHeight();
+void ofxProjectM::getMeshSize(int & x, int & y) const {
+	x = meshWidth;
+	y = meshHeight;
 }
 
-void ofxProjectM::presetSwitched(bool hardCut, unsigned int index, void * data) {
-	ofxProjectM * that = static_cast<ofxProjectM *>(data);
-	if (!that || !that->projectMPlaylistHandle) {
+void ofxProjectM::setPresetDuration(double duration) {
+	const double clampedDuration = std::max(0.0, duration);
+	if (clampedDuration == presetDuration) {
 		return;
 	}
 
-	char * presetPath = projectm_playlist_item(that->projectMPlaylistHandle, index);
-	that->presetName = formatPresetName(presetPath);
-	if (presetPath) {
-		projectm_playlist_free_string(presetPath);
-	}
-	that->setStatus("Switched projectM preset.");
-	if (!that->presetName.empty()) {
-		that->logNotice("Preset switched: " + that->presetName + ".");
-	} else {
-		that->logNotice("Preset switched.");
-	}
-}
-
-void ofxProjectM::presetSwitchFailed(const char * presetFilename, const char * message, void * data) {
-	ofxProjectM * that = static_cast<ofxProjectM *>(data);
-	if (!that) {
-		return;
-	}
-
-	that->presetName = std::string("Preset load failed: ") + formatPresetName(presetFilename);
-	if (message) {
-		that->setError(message);
-	}
-}
-
-void ofxProjectM::setWindowSize(int x, int y) {
-	if (x == windowWidth && y == windowHeight && fbo.isAllocated()) {
-		return;
-	}
-
-	windowWidth = x;
-	windowHeight = y;
-	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
-	clearAllocatedFbo(fbo);
+	presetDuration = clampedDuration;
 	if (projectMHandle) {
-		projectm_set_window_size(projectMHandle, windowWidth, windowHeight);
+		projectm_set_preset_duration(projectMHandle, presetDuration);
 	}
 }
 
-void ofxProjectM::setMeshSize(int x, int y) const {
+double ofxProjectM::getPresetDuration() const {
+	return presetDuration;
+}
+
+void ofxProjectM::setFrameTime(double secondsSinceFirstFrame) {
+	frameTime = secondsSinceFirstFrame;
 	if (projectMHandle) {
-		projectm_set_mesh_size(projectMHandle, x, y);
+		projectm_set_frame_time(projectMHandle, frameTime);
 	}
 }
 
-void ofxProjectM::setPresetDuration(double duration) const {
-	if (projectMHandle) {
-		projectm_set_preset_duration(projectMHandle, duration);
-	}
+void ofxProjectM::clearFrameTime() {
+	setFrameTime(-1.0);
 }
 
-void ofxProjectM::update() {
-	if (!projectMHandle || !fbo.isAllocated()) {
+double ofxProjectM::getFrameTime() const {
+	return frameTime;
+}
+
+double ofxProjectM::getLastFrameTime() const {
+	return projectMHandle ? projectm_get_last_frame_time(projectMHandle) : frameTime;
+}
+
+void ofxProjectM::setFps(int value) {
+	const int clampedFps = std::max(1, value);
+	if (clampedFps == fps) {
 		return;
 	}
 
-	ofPushStyle();
-	fbo.bind();
-	projectm_opengl_render_frame_fbo(projectMHandle, fbo.getId());
-	fbo.unbind();
-	ofPopStyle();
-}
-
-void ofxProjectM::draw(int x, int y) {
-	if (fbo.isAllocated()) {
-		fbo.getTexture().draw(x, y);
+	fps = clampedFps;
+	if (projectMHandle) {
+		projectm_set_fps(projectMHandle, fps);
 	}
 }
 
-void ofxProjectM::draw(int x, int y, int a, int b) {
-	if (fbo.isAllocated()) {
-		fbo.getTexture().draw(x, y, a, b);
-	}
+int ofxProjectM::getFps() const {
+	return fps;
 }
 
-const ofTexture & ofxProjectM::getTexture() const {
-	if (fbo.isAllocated()) {
-		return fbo.getTexture();
-	}
-
-	return texture;
-}
-
-void ofxProjectM::bind() {
-	if (fbo.isAllocated()) {
-		fbo.getTexture().bind();
-	}
-}
-
-void ofxProjectM::unbind() {
-	if (fbo.isAllocated()) {
-		fbo.getTexture().unbind();
-	}
-}
-
-void ofxProjectM::previousPreset() const {
-	if (projectMPlaylistHandle) {
-		projectm_playlist_play_previous(projectMPlaylistHandle, true);
-	}
-}
-
-void ofxProjectM::nextPreset() const {
-	if (projectMPlaylistHandle) {
-		projectm_playlist_play_next(projectMPlaylistHandle, true);
-	}
-}
-
-void ofxProjectM::randomPreset() const {
-	if (!projectMPlaylistHandle) {
+void ofxProjectM::setAspectCorrectionEnabled(bool enabled) {
+	if (aspectCorrectionEnabled == enabled) {
 		return;
 	}
 
-	const auto presetCount = projectm_playlist_size(projectMPlaylistHandle);
-	if (presetCount > 0) {
-		projectm_playlist_set_position(projectMPlaylistHandle, ofRandom(0, presetCount), true);
+	aspectCorrectionEnabled = enabled;
+	if (projectMHandle) {
+		projectm_set_aspect_correction(projectMHandle, aspectCorrectionEnabled);
 	}
 }
 
-int ofxProjectM::getPresetCount() const {
-	if (!projectMPlaylistHandle) {
-		return 0;
-	}
-
-	return static_cast<int>(projectm_playlist_size(projectMPlaylistHandle));
+bool ofxProjectM::isAspectCorrectionEnabled() const {
+	return aspectCorrectionEnabled;
 }
 
-int ofxProjectM::getPresetIndex() const {
-	if (!projectMPlaylistHandle || projectm_playlist_size(projectMPlaylistHandle) == 0) {
-		return -1;
+void ofxProjectM::setBeatSensitivity(float sensitivity) {
+	const float clampedSensitivity = std::max(0.0f, sensitivity);
+	if (clampedSensitivity == beatSensitivity) {
+		return;
 	}
 
-	return static_cast<int>(projectm_playlist_get_position(projectMPlaylistHandle));
+	beatSensitivity = clampedSensitivity;
+	if (projectMHandle) {
+		projectm_set_beat_sensitivity(projectMHandle, beatSensitivity);
+	}
 }
 
-bool ofxProjectM::setPresetIndex(int index, bool hardCut) const {
-	if (!projectMPlaylistHandle) {
-		return false;
+float ofxProjectM::getBeatSensitivity() const {
+	return beatSensitivity;
+}
+
+void ofxProjectM::setTexelOffset(float x, float y) {
+	texelOffsetX = x;
+	texelOffsetY = y;
+	if (projectMHandle) {
+		projectm_set_texel_offset(projectMHandle, texelOffsetX, texelOffsetY);
+	}
+}
+
+void ofxProjectM::getTexelOffset(float & x, float & y) const {
+	if (projectMHandle) {
+		projectm_get_texel_offset(projectMHandle, &x, &y);
+		return;
 	}
 
-	const auto presetCount = projectm_playlist_size(projectMPlaylistHandle);
-	if (presetCount == 0 || index < 0 || index >= static_cast<int>(presetCount)) {
-		return false;
+	x = texelOffsetX;
+	y = texelOffsetY;
+}
+
+void ofxProjectM::setEasterEgg(float value) {
+	easterEgg = std::max(0.0f, value);
+	if (projectMHandle) {
+		projectm_set_easter_egg(projectMHandle, easterEgg);
+	}
+}
+
+float ofxProjectM::getEasterEgg() const {
+	return projectMHandle ? projectm_get_easter_egg(projectMHandle) : easterEgg;
+}
+
+void ofxProjectM::setHardCutEnabled(bool enabled) {
+	if (hardCutEnabled == enabled) {
+		return;
 	}
 
-	projectm_playlist_set_position(projectMPlaylistHandle, static_cast<uint32_t>(index), hardCut);
-	return true;
-}
-
-const std::string & ofxProjectM::getPresetName() const {
-	return presetName;
-}
-
-int ofxProjectM::getMaxSamples() const {
-	return projectm_pcm_get_max_samples();
-}
-
-void ofxProjectM::audio(const float * buffer, int bufferSize, int channels) const {
-	if (projectMHandle && buffer && bufferSize > 0 && channels > 0) {
-		projectm_pcm_add_float(projectMHandle, buffer, bufferSize, (projectm_channels)channels);
+	hardCutEnabled = enabled;
+	if (projectMHandle) {
+		projectm_set_hard_cut_enabled(projectMHandle, hardCutEnabled);
 	}
+}
+
+bool ofxProjectM::isHardCutEnabled() const {
+	return hardCutEnabled;
+}
+
+void ofxProjectM::setHardCutDuration(double duration) {
+	const double clampedDuration = std::max(0.0, duration);
+	if (clampedDuration == hardCutDuration) {
+		return;
+	}
+
+	hardCutDuration = clampedDuration;
+	if (projectMHandle) {
+		projectm_set_hard_cut_duration(projectMHandle, hardCutDuration);
+	}
+}
+
+double ofxProjectM::getHardCutDuration() const {
+	return hardCutDuration;
+}
+
+void ofxProjectM::setHardCutSensitivity(float sensitivity) {
+	const float clampedSensitivity = std::max(0.0f, sensitivity);
+	if (clampedSensitivity == hardCutSensitivity) {
+		return;
+	}
+
+	hardCutSensitivity = clampedSensitivity;
+	if (projectMHandle) {
+		projectm_set_hard_cut_sensitivity(projectMHandle, hardCutSensitivity);
+	}
+}
+
+float ofxProjectM::getHardCutSensitivity() const {
+	return hardCutSensitivity;
+}
+
+void ofxProjectM::setSoftCutDuration(double duration) {
+	const double clampedDuration = std::max(0.0, duration);
+	if (clampedDuration == softCutDuration) {
+		return;
+	}
+
+	softCutDuration = clampedDuration;
+	if (projectMHandle) {
+		projectm_set_soft_cut_duration(projectMHandle, softCutDuration);
+	}
+}
+
+double ofxProjectM::getSoftCutDuration() const {
+	return softCutDuration;
+}
+
+void ofxProjectM::setPresetStartClean(bool enabled) {
+	presetStartClean = enabled;
+	if (projectMHandle) {
+		projectm_set_preset_start_clean(projectMHandle, presetStartClean);
+	}
+}
+
+bool ofxProjectM::isPresetStartClean() const {
+	return projectMHandle ? projectm_get_preset_start_clean(projectMHandle) : presetStartClean;
+}
+
+void ofxProjectM::setPresetLocked(bool locked) {
+	if (presetLocked == locked) {
+		return;
+	}
+
+	presetLocked = locked;
+	if (projectMHandle) {
+		projectm_set_preset_locked(projectMHandle, presetLocked);
+	}
+}
+
+bool ofxProjectM::isPresetLocked() const {
+	return presetLocked;
 }

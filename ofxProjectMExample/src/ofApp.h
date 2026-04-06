@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxImGui.h"
 #include "ofxProjectM.h"
 
 class ofApp : public ofBaseApp{
@@ -10,6 +11,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+		void exit();
 
 		void keyPressed  (int key);
 		void keyReleased(int key);
@@ -45,6 +47,8 @@ class ofApp : public ofBaseApp{
 		float phaseAdderTarget;
 
 		ofxProjectM projectM;
+		ofxImGui::Gui gui;
 		ofBoxPrimitive box;
 		ofEasyCam cam;
+		bool audioRunning = true;
 };
