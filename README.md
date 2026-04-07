@@ -113,6 +113,30 @@ Outputs:
 - `libs/projectM/lib/vs/Release/libprojectM-4-playlist.lib`
 - `libs/projectM/include/projectM-4`
 
+## VLC bridge example runtime
+
+`ofxProjectMSimpleVlcExample` depends on `ofxVlc4` for `libVLC`.
+
+For a normal local setup with Project Generator, first install the VLC runtime in the sibling addon:
+
+```bash
+bash ../ofxVlc4/scripts/install-libvlc.sh
+```
+
+Then sync the runnable VLC layout into the simple bridge example:
+
+```bash
+bash scripts/sync_vlc_runtime.sh
+```
+
+That prepares:
+
+- `ofxProjectMSimpleVlcExample/bin/libvlc.dll`
+- `ofxProjectMSimpleVlcExample/bin/libvlccore.dll`
+- `ofxProjectMSimpleVlcExample/bin/plugins/`
+- `ofxProjectMSimpleVlcExample/bin/lua/`
+- `ofxProjectMSimpleVlcExample/dll/x64/` with only the root VLC DLLs needed by generated Visual Studio projects
+
 ### macOS
 
 Run:

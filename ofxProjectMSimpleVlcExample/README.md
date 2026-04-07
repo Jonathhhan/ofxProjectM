@@ -33,6 +33,7 @@ Quick setup:
 
 ```bash
 bash ../scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
+bash ../scripts/sync_vlc_runtime.sh
 ```
 
 Optional media seed files can be placed in `bin/data` as:
