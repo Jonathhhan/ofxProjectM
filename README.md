@@ -228,3 +228,4 @@ git clone --branch develop https://github.com/jvcleave/ofxImGui.git
 - The source split does not require `addon_config.mk` updates because openFrameworks auto-scans `src`.
 - The full `ofxVlc4Example` exposes part of the `projectM` surface, but the addon API is broader than the current GUI.
 
+
