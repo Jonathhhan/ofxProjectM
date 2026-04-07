@@ -1,5 +1,35 @@
 #include "ofApp.h"
 
+namespace {
+std::vector<std::filesystem::path> defaultSeedMediaCandidates() {
+	const std::filesystem::path sharedMoviesDirectory =
+		std::filesystem::path(ofFilePath::getCurrentExeDir()) /
+		"..\\..\\..\\..\\examples\\video\\videoPlayerExample\\bin\\data\\movies";
+
+	return {
+		ofToDataPath("finger.mp4", true),
+		ofToDataPath("fingers.mp4", true),
+		ofToDataPath("movie.mp4", true),
+		ofToDataPath("sample.mp4", true),
+		sharedMoviesDirectory / "finger.mp4",
+		sharedMoviesDirectory / "fingers.mp4"
+	};
+}
+
+bool isLikelySupportedMediaPath(const std::filesystem::path & path) {
+	static const std::set<std::string> extensions = {
+		".wav", ".mp3", ".flac", ".ogg", ".opus",
+		".m4a", ".aac", ".aiff", ".wma", ".mid", ".midi",
+		".mp4", ".mov", ".mkv", ".avi", ".wmv", ".asf",
+		".webm", ".m4v", ".mpg", ".mpeg", ".ts", ".mts",
+		".m2ts", ".m2v", ".vob", ".ogv", ".3gp", ".m3u8",
+		".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"
+	};
+	std::string extension = ofToLower(path.extension().string());
+	return !extension.empty() && extensions.count(extension) > 0;
+}
+}
+
 void ofApp::setup() {
 	ofSetWindowTitle("ofxProjectM Simple VLC Example");
 	ofSetFrameRate(60);
@@ -46,12 +76,7 @@ void ofApp::setupSoundStream() {
 }
 
 void ofApp::loadSeedMedia() {
-	const std::vector<std::filesystem::path> candidates = {
-		ofToDataPath("movie.mp4", true),
-		ofToDataPath("sample.mp4", true)
-	};
-
-	for (const auto & candidate : candidates) {
+	for (const auto & candidate : defaultSeedMediaCandidates()) {
 		if (std::filesystem::exists(candidate)) {
 			loadMedia(candidate, true);
 			return;
@@ -61,6 +86,10 @@ void ofApp::loadSeedMedia() {
 
 bool ofApp::loadMedia(const std::filesystem::path & path, bool playNow) {
 	if (path.empty() || !std::filesystem::exists(path)) {
+		return false;
+	}
+
+	if (!isLikelySupportedMediaPath(path)) {
 		return false;
 	}
 
@@ -254,7 +283,7 @@ void ofApp::updateProjectMWindowSize() {
 
 std::string ofApp::mediaStatusLabel() const {
 	if (!player.hasPlaylist()) {
-		return "Drop a file, press O, or place movie.mp4 in bin/data.";
+		return "Drop a file, press O, or place fingers.mp4 in bin/data.";
 	}
 
 	const auto currentItem = player.getCurrentPlaylistItemInfo();
