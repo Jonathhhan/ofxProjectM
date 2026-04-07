@@ -183,6 +183,22 @@ function Invoke-NativeCommand {
 	}
 }
 
+function Find-StagedLibrary {
+	param(
+		[string]$StageDir,
+		[string[]]$CandidateNames
+	)
+
+	foreach ($Candidate in $CandidateNames) {
+		$Match = Get-ChildItem -Path $StageDir -Recurse -Filter $Candidate | Select-Object -First 1 -ExpandProperty FullName
+		if ($Match -and (Test-Path $Match)) {
+			return $Match
+		}
+	}
+
+	return $null
+}
+
 if ([string]::IsNullOrWhiteSpace($AddonRoot)) {
 	$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 	$AddonRoot = Split-Path -Parent $scriptDir
@@ -242,17 +258,24 @@ try {
 			"--prefix", $stageDir
 		)
 
-		$mainLib = Get-ChildItem -Path $stageDir -Recurse -Filter "libprojectM-4.lib" | Select-Object -First 1 -ExpandProperty FullName
-		$playlistLib = Get-ChildItem -Path $stageDir -Recurse -Filter "libprojectM-4-playlist.lib" | Select-Object -First 1 -ExpandProperty FullName
+		$mainLibCandidates = @("libprojectM-4.lib")
+		$playlistLibCandidates = @("libprojectM-4-playlist.lib")
+		if ($Configuration -ieq "Debug") {
+			$mainLibCandidates = @("libprojectM-4d.lib", "libprojectM-4.lib")
+			$playlistLibCandidates = @("libprojectM-4-playlistd.lib", "libprojectM-4-playlist.lib")
+		}
+
+		$mainLib = Find-StagedLibrary -StageDir $stageDir -CandidateNames $mainLibCandidates
+		$playlistLib = Find-StagedLibrary -StageDir $stageDir -CandidateNames $playlistLibCandidates
 		$installedIncludeDir = Join-Path $stageDir "include\projectM-4"
 		$configTargetLibDir = Join-Path $targetLibDir $Configuration
 
 		if (-not $mainLib -or -not (Test-Path $mainLib)) {
-			throw "Could not find built libprojectM-4.lib in $stageDir"
+			throw "Could not find built libprojectM-4(.d).lib in $stageDir"
 		}
 
 		if (-not $playlistLib -or -not (Test-Path $playlistLib)) {
-			throw "Could not find built libprojectM-4-playlist.lib in $stageDir"
+			throw "Could not find built libprojectM-4-playlist(.d).lib in $stageDir"
 		}
 
 		if (-not (Test-Path $installedIncludeDir)) {
