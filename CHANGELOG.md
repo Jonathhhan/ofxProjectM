@@ -4,9 +4,9 @@
 
 Highlights:
 
-- simplified the example lineup down to a single maintained `ofxProjectMExample`
-- retired the older `ofxProjectMSimpleVlcExample` bridge sample
-- made the VLC runtime sync script target `ofxProjectMExample` directly
+- removed the repo-owned app examples again
+- documented `ofxVlc4Example` as the maintained `ofxProjectM` integration example
+- moved preset and texture asset downloads out of `ofxProjectM` and into `ofxVlc4Example`
 
 ## 1.0.1
 

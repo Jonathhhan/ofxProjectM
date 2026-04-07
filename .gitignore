@@ -9,28 +9,6 @@
 *.vcxproj.user
 *.tmp
 
-# Generated Visual Studio project files
-ofxProjectMSimpleVlcExample/icon.rc
-ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.sln
-ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.vcxproj
-ofxProjectMSimpleVlcExample/ofxProjectMSimpleVlcExample.vcxproj.filters
-
 # Locally built projectM outputs
 libs/projectM/include/projectM-4/
 libs/projectM/lib/vs/
-
-# Generated ofxProjectMExample Visual Studio project files
-ofxProjectMExample/icon.rc
-ofxProjectMExample/ofxProjectMExample.sln
-ofxProjectMExample/ofxProjectMExample.vcxproj
-ofxProjectMExample/ofxProjectMExample.vcxproj.filters
-!ofxProjectMExample/bin/
-ofxProjectMExample/bin/*
-!ofxProjectMExample/bin/data/
-ofxProjectMExample/bin/data/*
-!ofxProjectMExample/bin/data/.gitkeep
-!ofxProjectMSimpleVlcExample/bin/
-ofxProjectMSimpleVlcExample/bin/*
-!ofxProjectMSimpleVlcExample/bin/data/
-ofxProjectMSimpleVlcExample/bin/data/*
-!ofxProjectMSimpleVlcExample/bin/data/.gitkeep
