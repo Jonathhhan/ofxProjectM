@@ -29,6 +29,8 @@ Quick setup:
 bash ../scripts/download-projectm-assets.sh --example ofxProjectMExample
 ```
 
+This repo keeps `bin/data` present but empty by default. Download the preset and texture packs when you want the example populated locally.
+
 ## Controls
 
 The main controls are in the ImGui panel:

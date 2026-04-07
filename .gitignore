@@ -24,3 +24,13 @@ ofxProjectMExample/icon.rc
 ofxProjectMExample/ofxProjectMExample.sln
 ofxProjectMExample/ofxProjectMExample.vcxproj
 ofxProjectMExample/ofxProjectMExample.vcxproj.filters
+!ofxProjectMExample/bin/
+ofxProjectMExample/bin/*
+!ofxProjectMExample/bin/data/
+ofxProjectMExample/bin/data/*
+!ofxProjectMExample/bin/data/.gitkeep
+!ofxProjectMSimpleVlcExample/bin/
+ofxProjectMSimpleVlcExample/bin/*
+!ofxProjectMSimpleVlcExample/bin/data/
+ofxProjectMSimpleVlcExample/bin/data/*
+!ofxProjectMSimpleVlcExample/bin/data/.gitkeep

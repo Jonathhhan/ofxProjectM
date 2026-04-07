@@ -36,6 +36,8 @@ bash ../scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExampl
 bash ../scripts/sync_vlc_runtime.sh
 ```
 
+This repo keeps `bin/data` present but empty by default. Add presets, textures, and optional media seeds only when you want them locally.
+
 Optional media seed files can be placed in `bin/data` as:
 
 - `movie.mp4`

@@ -206,6 +206,7 @@ The script installs into:
 - `ofxProjectMSimpleVlcExample/bin/data/textures`
 
 The packs are intentionally separate because they are fairly large.
+The repository keeps the example `bin/data` folders present but empty by default, so fresh clones stay lightweight and you opt into preset/texture downloads explicitly.
 For normal addon development, keep the built `projectM` libraries shared under `libs/projectM` and only copy the preset and texture folders into an app's `bin/data` when you want that app to be truly standalone.
 
 Manual layout if you prefer:
