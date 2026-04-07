@@ -42,7 +42,6 @@ Usage:
 
 Options:
   --vlc-addon-root PATH   Path to the sibling ofxVlc4 addon
-  --example NAME          Target example folder name inside this addon
   --help                  Show this help
 EOF
 }
@@ -51,10 +50,6 @@ while [[ $# -gt 0 ]]; do
 	case "$1" in
 		--vlc-addon-root)
 			VLC_ADDON_ROOT="${2:-}"
-			shift 2
-			;;
-		--example)
-			TARGET_EXAMPLE_NAME="${2:-}"
 			shift 2
 			;;
 		--help|-h)

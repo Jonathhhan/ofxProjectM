@@ -32,6 +32,10 @@ private:
 	void updateProjectMTextureBinding();
 	void updateProjectMWindowSize();
 	void clampSelectedPlaylistIndex(const ofxVlc4::PlaylistStateInfo & state);
+	void drawControlPanel(const ofxVlc4::PlaylistStateInfo & playlistState);
+	void drawTransportSection(const ofxVlc4::PlaylistStateInfo & playlistState);
+	void drawPlaylistSection(const ofxVlc4::PlaylistStateInfo & playlistState);
+	void drawProjectMSection();
 
 	ofxProjectM projectM;
 	ofxVlc4 player;

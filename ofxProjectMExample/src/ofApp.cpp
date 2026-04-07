@@ -171,106 +171,123 @@ void ofApp::draw() {
 	gui.begin();
 	ImGui::SetNextWindowPos(ImVec2(20.0f, 20.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(390.0f, 520.0f), ImGuiCond_FirstUseEver);
-	if (ImGui::Begin("ProjectM + VLC")) {
-		ImGui::TextWrapped("A compact projectM example driven by libVLC playback, with one media view, one projectM view, and a simple playlist.");
-		ImGui::Separator();
-		ImGui::Text("Media: %s", mediaStatusLabel().c_str());
-		ImGui::Text("Preset: %s", projectM.getPresetName().c_str());
-		ImGui::Text("Texture source: %s", projectMTextureModeLabel().c_str());
-
-		if (ImGui::Button("Open Replace")) {
-			ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
-			if (result.bSuccess) {
-				replacePlaylistWithPath(result.getPath(), true);
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Add Media")) {
-			ofFileDialogResult result = ofSystemLoadDialog("Add a media file");
-			if (result.bSuccess) {
-				addPathToPlaylist(result.getPath());
-			}
-		}
-
-		if (ImGui::Button(player.isPlaying() ? "Pause" : "Play")) {
-			if (player.hasPlaylist()) {
-				if (player.isPlaying()) {
-					player.pause();
-				} else if (playlistState.currentIndex >= 0) {
-					player.playIndex(playlistState.currentIndex);
-				} else {
-					player.play();
-				}
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Stop")) {
-			player.stop();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Prev Item")) {
-			player.previousMediaListItem();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Next Item")) {
-			player.nextMediaListItem();
-		}
-
-		ImGui::Separator();
-		ImGui::Text("Playlist");
-		ImGui::BeginChild("PlaylistList", ImVec2(0.0f, 180.0f), true);
-		for (const auto & item : playlistState.items) {
-			const std::string label = item.index == playlistState.currentIndex
-				? ("> " + item.label)
-				: item.label;
-			if (ImGui::Selectable(label.c_str(), selectedPlaylistIndex == item.index)) {
-				selectedPlaylistIndex = item.index;
-				player.playIndex(item.index);
-			}
-		}
-		ImGui::EndChild();
-
-		if (ImGui::Button("Remove Selected")) {
-			if (selectedPlaylistIndex >= 0 && selectedPlaylistIndex < playlistState.size) {
-				player.removeFromPlaylist(selectedPlaylistIndex);
-				const auto updatedState = player.getPlaylistStateInfo();
-				clampSelectedPlaylistIndex(updatedState);
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Clear Playlist")) {
-			player.clearPlaylist();
-			selectedPlaylistIndex = -1;
-		}
-
-		ImGui::Separator();
-		if (ImGui::Button("Previous Preset")) {
-			projectM.previousPreset();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Next Preset")) {
-			projectM.nextPreset();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Random Preset")) {
-			projectM.randomPreset();
-		}
-
-		bool useTexture = useVideoTextureForProjectM;
-		if (ImGui::Checkbox("Use VLC Video Texture", &useTexture)) {
-			useVideoTextureForProjectM = useTexture;
-			updateProjectMTextureBinding();
-		}
-
-		if (!projectM.getLastErrorMessage().empty()) {
-			ImGui::TextColored(ImVec4(1.0f, 0.47f, 0.47f, 1.0f), "%s", projectM.getLastErrorMessage().c_str());
-		}
-
-		ImGui::Separator();
-		ImGui::TextWrapped("Keyboard fallback: O open/replace, A add media, Space play/pause, S stop, Up/Down playlist, Delete remove selected, Left/Right preset, N random preset, T toggle texture.");
-	}
-	ImGui::End();
+	drawControlPanel(playlistState);
 	gui.end();
+}
+
+void ofApp::drawControlPanel(const ofxVlc4::PlaylistStateInfo & playlistState) {
+	if (!ImGui::Begin("ProjectM + VLC")) {
+		ImGui::End();
+		return;
+	}
+
+	ImGui::TextWrapped("A compact VLC + projectM player with the same two-display workflow as the full ofxVlc4 example.");
+	ImGui::Text("Media: %s", mediaStatusLabel().c_str());
+	ImGui::Text("Preset: %s", projectM.getPresetName().c_str());
+	ImGui::Text("Texture source: %s", projectMTextureModeLabel().c_str());
+
+	ImGui::SeparatorText("Media");
+	if (ImGui::Button("Open Replace")) {
+		ofFileDialogResult result = ofSystemLoadDialog("Select a media file");
+		if (result.bSuccess) {
+			replacePlaylistWithPath(result.getPath(), true);
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Media")) {
+		ofFileDialogResult result = ofSystemLoadDialog("Add a media file");
+		if (result.bSuccess) {
+			addPathToPlaylist(result.getPath());
+		}
+	}
+
+	drawTransportSection(playlistState);
+	drawPlaylistSection(playlistState);
+	drawProjectMSection();
+
+	if (!projectM.getLastErrorMessage().empty()) {
+		ImGui::SeparatorText("Status");
+		ImGui::TextColored(ImVec4(1.0f, 0.47f, 0.47f, 1.0f), "%s", projectM.getLastErrorMessage().c_str());
+	}
+
+	ImGui::SeparatorText("Keyboard");
+	ImGui::TextWrapped("O open/replace, A add media, Space play/pause, S stop, Up/Down playlist, Delete remove selected, Left/Right preset, N random preset, T toggle texture.");
+	ImGui::End();
+}
+
+void ofApp::drawTransportSection(const ofxVlc4::PlaylistStateInfo & playlistState) {
+	ImGui::SeparatorText("Transport");
+	if (ImGui::Button(player.isPlaying() ? "Pause" : "Play")) {
+		if (player.hasPlaylist()) {
+			if (player.isPlaying()) {
+				player.pause();
+			} else if (playlistState.currentIndex >= 0) {
+				player.playIndex(playlistState.currentIndex);
+			} else {
+				player.play();
+			}
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Stop")) {
+		player.stop();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Prev Item")) {
+		player.previousMediaListItem();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Next Item")) {
+		player.nextMediaListItem();
+	}
+}
+
+void ofApp::drawPlaylistSection(const ofxVlc4::PlaylistStateInfo & playlistState) {
+	ImGui::SeparatorText("Playlist");
+	ImGui::BeginChild("PlaylistList", ImVec2(0.0f, 180.0f), true);
+	for (const auto & item : playlistState.items) {
+		const std::string label = item.index == playlistState.currentIndex
+			? ("> " + item.label)
+			: item.label;
+		if (ImGui::Selectable(label.c_str(), selectedPlaylistIndex == item.index)) {
+			selectedPlaylistIndex = item.index;
+			player.playIndex(item.index);
+		}
+	}
+	ImGui::EndChild();
+
+	if (ImGui::Button("Remove Selected")) {
+		if (selectedPlaylistIndex >= 0 && selectedPlaylistIndex < playlistState.size) {
+			player.removeFromPlaylist(selectedPlaylistIndex);
+			clampSelectedPlaylistIndex(player.getPlaylistStateInfo());
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Clear Playlist")) {
+		player.clearPlaylist();
+		selectedPlaylistIndex = -1;
+	}
+}
+
+void ofApp::drawProjectMSection() {
+	ImGui::SeparatorText("projectM");
+	if (ImGui::Button("Previous Preset")) {
+		projectM.previousPreset();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Next Preset")) {
+		projectM.nextPreset();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Random Preset")) {
+		projectM.randomPreset();
+	}
+
+	bool useTexture = useVideoTextureForProjectM;
+	if (ImGui::Checkbox("Use VLC Video Texture", &useTexture)) {
+		useVideoTextureForProjectM = useTexture;
+		updateProjectMTextureBinding();
+	}
 }
 
 void ofApp::audioOut(ofSoundBuffer & buffer) {

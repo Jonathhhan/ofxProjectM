@@ -27,7 +27,7 @@ If you package your own standalone app, copy the preset and texture folders you 
 Quick setup (`ofxVlc4` must be prepared first):
 
 ```bash
-bash ../scripts/download-projectm-assets.sh --example ofxProjectMExample
+bash ../scripts/download-projectm-assets.sh
 bash ../ofxVlc4/scripts/install-libvlc.sh
 bash ../scripts/sync_vlc_runtime.sh
 ```

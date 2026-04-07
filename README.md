@@ -142,12 +142,6 @@ So the ownership model is:
 - `ofxVlc4` installs and owns the `libVLC` runtime
 - `ofxProjectMExample` reuses that installed runtime for the VLC bridge workflow
 
-The sync script now defaults to `ofxProjectMExample`. If you explicitly want the older bridge sample instead, use:
-
-```bash
-bash scripts/sync_vlc_runtime.sh --example ofxProjectMSimpleVlcExample
-```
-
 ### macOS
 
 Run:
@@ -204,9 +198,8 @@ bash scripts/download-projectm-assets.sh
 Useful variants:
 
 ```bash
-bash scripts/download-projectm-assets.sh --example ofxProjectMExample
 bash scripts/download-projectm-assets.sh --presets
-bash scripts/download-projectm-assets.sh --textures --example ofxProjectMExample
+bash scripts/download-projectm-assets.sh --textures
 ```
 
 The script installs into:
@@ -236,7 +229,7 @@ git clone --branch develop https://github.com/jvcleave/ofxImGui.git
 - The addon uses one public `ofxProjectM` facade even though implementation is now split internally.
 - The source split does not require `addon_config.mk` updates because openFrameworks auto-scans `src`.
 - The full `ofxVlc4Example` exposes part of the `projectM` surface, but the addon API is broader than the current GUI.
-- `ofxProjectMSimpleVlcExample` remains in the repo only as an older bridge sample, but `ofxProjectMExample` is the intended main example now.
+- `ofxProjectMExample` is the single maintained example in this repo.
 
 
 

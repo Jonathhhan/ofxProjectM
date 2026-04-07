@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+Highlights:
+
+- simplified the example lineup down to a single maintained `ofxProjectMExample`
+- retired the older `ofxProjectMSimpleVlcExample` bridge sample
+- made the VLC runtime sync script target `ofxProjectMExample` directly
+
 ## 1.0.1
 
 Highlights:

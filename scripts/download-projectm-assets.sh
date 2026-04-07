@@ -8,7 +8,6 @@ TEXTURES_REPO_URL="https://github.com/projectM-visualizer/presets-milkdrop-textu
 DOWNLOAD_PRESETS=0
 DOWNLOAD_TEXTURES=0
 KEEP_TEMP=0
-TARGET_EXAMPLE=""
 
 write_step() {
 	printf '==> %s\n' "$1"
@@ -42,19 +41,10 @@ copy_repo_contents() {
 }
 
 example_targets() {
-	local example_name
-	for example_name in ofxProjectMExample ofxProjectMSimpleVlcExample; do
-		if [[ -n "$TARGET_EXAMPLE" && "$example_name" != "$TARGET_EXAMPLE" ]]; then
-			continue
-		fi
-
-		local example_root="${ADDON_ROOT}/${example_name}"
-		if [[ ! -d "$example_root" ]]; then
-			continue
-		fi
-
+	local example_root="${ADDON_ROOT}/ofxProjectMExample"
+	if [[ -d "$example_root" ]]; then
 		printf '%s\n' "$example_root"
-	done
+	fi
 }
 
 usage() {
@@ -65,15 +55,12 @@ Usage:
 Options:
   --presets                   Download the Cream of the Crop preset pack
   --textures                  Download the full Milkdrop texture pack
-  --example NAME              Limit install to one example
-                              Supported: ofxProjectMExample, ofxProjectMSimpleVlcExample
   --keep-temp                 Keep the temporary clone directory
 
 Examples:
   bash scripts/download-projectm-assets.sh
   bash scripts/download-projectm-assets.sh --presets
   bash scripts/download-projectm-assets.sh --textures
-  bash scripts/download-projectm-assets.sh --presets --textures --example ofxProjectMSimpleVlcExample
 EOF
 }
 
@@ -87,11 +74,6 @@ while [[ $# -gt 0 ]]; do
 			DOWNLOAD_TEXTURES=1
 			shift
 			;;
-		--example)
-			TARGET_EXAMPLE="${2:-}"
-			[[ -n "$TARGET_EXAMPLE" ]] || die "--example requires a value"
-			shift 2
-			;;
 		--keep-temp)
 			KEEP_TEMP=1
 			shift
@@ -103,12 +85,8 @@ while [[ $# -gt 0 ]]; do
 		*)
 			die "Unknown argument: $1"
 			;;
-	esac
+		esac
 done
-
-if [[ -n "$TARGET_EXAMPLE" && "$TARGET_EXAMPLE" != "ofxProjectMExample" && "$TARGET_EXAMPLE" != "ofxProjectMSimpleVlcExample" ]]; then
-	die "Unsupported example '$TARGET_EXAMPLE'."
-fi
 
 require_command git
 require_command mktemp
