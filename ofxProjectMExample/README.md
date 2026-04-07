@@ -12,7 +12,7 @@ What it shows:
 ## Addon dependencies
 
 - `ofxProjectM`
-- `ofxImGui`
+- `ofxImGui` on its `develop` branch
 
 ## Runtime assets
 
@@ -47,3 +47,5 @@ Keyboard fallback:
 - `E`: stop audio
 - `+` / `-`: adjust volume
 - any other key: random preset
+
+

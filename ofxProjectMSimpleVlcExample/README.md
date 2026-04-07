@@ -13,7 +13,7 @@ What it shows:
 
 - `ofxProjectM`
 - `ofxVlc4`
-- `ofxImGui`
+- `ofxImGui` on its `develop` branch
 
 ## Runtime assets
 
@@ -61,3 +61,5 @@ Keyboard fallback:
 - `T`: toggle whether `projectM` sees the VLC video texture
 
 You can also drag a media file onto the window.
+
+

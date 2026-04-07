@@ -214,8 +214,17 @@ Manual layout if you prefer:
 - presets from `presets-cream-of-the-crop` go in the `presets` folder
 - textures from `presets-milkdrop-texture-pack` go in the `textures` folder
 
+## ofxImGui branch
+
+`ofxProjectM`''s ImGui-based examples currently expect [`ofxImGui`''s `develop` branch](https://github.com/jvcleave/ofxImGui/tree/develop). If you install `ofxImGui` manually, prefer:
+
+```bash
+git clone --branch develop https://github.com/jvcleave/ofxImGui.git
+```
+
 ## Notes
 
 - The addon uses one public `ofxProjectM` facade even though implementation is now split internally.
 - The source split does not require `addon_config.mk` updates because openFrameworks auto-scans `src`.
 - The full `ofxVlc4Example` exposes part of the `projectM` surface, but the addon API is broader than the current GUI.
+
