@@ -117,7 +117,7 @@ Outputs:
 
 `ofxProjectMSimpleVlcExample` depends on `ofxVlc4` for `libVLC`.
 
-For a normal local setup with Project Generator, first install the VLC runtime in the sibling addon:
+For a normal local setup with Project Generator, ofxVlc4 must be set up first. Start by installing the VLC runtime in the sibling addon:
 
 ```bash
 bash ../ofxVlc4/scripts/install-libvlc.sh
@@ -227,5 +227,6 @@ git clone --branch develop https://github.com/jvcleave/ofxImGui.git
 - The addon uses one public `ofxProjectM` facade even though implementation is now split internally.
 - The source split does not require `addon_config.mk` updates because openFrameworks auto-scans `src`.
 - The full `ofxVlc4Example` exposes part of the `projectM` surface, but the addon API is broader than the current GUI.
+
 
 

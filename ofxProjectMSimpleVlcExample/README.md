@@ -29,7 +29,7 @@ The full packs are the same ones listed in the main addon README:
 - `presets-cream-of-the-crop`
 - `presets-milkdrop-texture-pack`
 
-Quick setup:
+Quick setup (ofxVlc4 must be prepared first):
 
 ```bash
 bash ../scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
@@ -61,5 +61,6 @@ Keyboard fallback:
 - `T`: toggle whether `projectM` sees the VLC video texture
 
 You can also drag a media file onto the window.
+
 
 
