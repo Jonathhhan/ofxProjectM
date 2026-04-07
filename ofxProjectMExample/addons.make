@@ -1,2 +1,3 @@
 ofxProjectM
+ofxVlc4
 ofxImGui

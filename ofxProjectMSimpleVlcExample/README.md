@@ -1,5 +1,7 @@
 # ofxProjectMSimpleVlcExample
 
+Legacy bridge example. For normal use, prefer [../ofxProjectMExample/README.md](../ofxProjectMExample/README.md).
+
 Small example that wires `ofxVlc4` into `ofxProjectM`.
 
 What it shows:
@@ -33,8 +35,10 @@ Quick setup (ofxVlc4 must be prepared first):
 
 ```bash
 bash ../scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
-bash ../scripts/sync_vlc_runtime.sh
+bash ../scripts/sync_vlc_runtime.sh --example ofxProjectMSimpleVlcExample
 ```
+
+`addons.make` is not enough on its own here either. `ofxVlc4` must install the `libVLC` runtime first, and this example then reuses that installed runtime.
 
 This repo keeps `bin/data` present but empty by default. Add presets, textures, and optional media seeds only when you want them locally.
 

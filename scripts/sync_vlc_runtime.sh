@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADDON_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DEFAULT_VLC_ADDON_ROOT="$(cd "${ADDON_ROOT}/../ofxVlc4" 2>/dev/null && pwd || true)"
 VLC_ADDON_ROOT="${DEFAULT_VLC_ADDON_ROOT}"
-TARGET_EXAMPLE="${ADDON_ROOT}/ofxProjectMSimpleVlcExample"
+TARGET_EXAMPLE_NAME="ofxProjectMExample"
 
 write_step() {
 	printf '==> %s\n' "$1"
@@ -42,6 +42,7 @@ Usage:
 
 Options:
   --vlc-addon-root PATH   Path to the sibling ofxVlc4 addon
+  --example NAME          Target example folder name inside this addon
   --help                  Show this help
 EOF
 }
@@ -50,6 +51,10 @@ while [[ $# -gt 0 ]]; do
 	case "$1" in
 		--vlc-addon-root)
 			VLC_ADDON_ROOT="${2:-}"
+			shift 2
+			;;
+		--example)
+			TARGET_EXAMPLE_NAME="${2:-}"
 			shift 2
 			;;
 		--help|-h)
@@ -63,6 +68,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "${VLC_ADDON_ROOT}" && -d "${VLC_ADDON_ROOT}" ]] || die "Could not find ofxVlc4 addon. Pass it with --vlc-addon-root."
+
+TARGET_EXAMPLE="${ADDON_ROOT}/${TARGET_EXAMPLE_NAME}"
+[[ -d "${TARGET_EXAMPLE}" ]] || die "Missing target example at ${TARGET_EXAMPLE}."
 
 SOURCE_RUNTIME="${VLC_ADDON_ROOT}/libs/libvlc/runtime/vs/x64"
 [[ -d "${SOURCE_RUNTIME}" ]] || die "Missing VLC runtime at ${SOURCE_RUNTIME}. Run ofxVlc4/scripts/install-libvlc.sh first."

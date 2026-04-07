@@ -3,52 +3,45 @@
 #include "ofMain.h"
 #include "ofxImGui.h"
 #include "ofxProjectM.h"
+#include "ofxVlc4.h"
 
-class ofApp : public ofBaseApp{
+#include <filesystem>
 
-	public:
+class ofApp : public ofBaseApp {
+public:
+	void setup();
+	void update();
+	void draw();
+	void exit();
 
-		void setup();
-		void update();
-		void draw();
-		void exit();
+	void keyPressed(int key);
+	void windowResized(int w, int h);
+	void dragEvent(ofDragInfo dragInfo);
+	void audioOut(ofSoundBuffer & buffer);
 
-		void keyPressed  (int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
-		
-		void audioOut(ofSoundBuffer & buffer);
-		
-		
-		ofSoundStream soundStream;
+private:
+	void setupProjectM();
+	void setupPlayer();
+	void setupSoundStream();
+	void loadSeedMedia();
+	bool replacePlaylistWithPath(const std::filesystem::path & path, bool playNow = true);
+	bool addPathToPlaylist(const std::filesystem::path & path);
+	void addDroppedPathsToPlaylist(const std::vector<std::filesystem::path> & paths);
+	std::string mediaStatusLabel() const;
+	std::string projectMTextureModeLabel() const;
+	void updateProjectMTextureBinding();
+	void updateProjectMWindowSize();
+	void clampSelectedPlaylistIndex(const ofxVlc4::PlaylistStateInfo & state);
 
-		float pan;
-		int sampleRate;
-		bool bNoise;
-		float volume;
-		int bufferSize;
-		int outputChannels;
+	ofxProjectM projectM;
+	ofxVlc4 player;
+	ofxImGui::Gui gui;
+	ofSoundStream soundStream;
 
-		vector <float> lAudio;
-		vector <float> rAudio;
-		
-		//------------------- for the simple sine wave synthesis
-		float targetFrequency;
-		float phase;
-		float phaseAdder;
-		float phaseAdderTarget;
-
-		ofxProjectM projectM;
-		ofxImGui::Gui gui;
-		ofBoxPrimitive box;
-		ofEasyCam cam;
-		bool audioRunning = true;
+	int sampleRate = 44100;
+	int outputChannels = 2;
+	int bufferSize = 512;
+	float previewMargin = 20.0f;
+	bool useVideoTextureForProjectM = true;
+	int selectedPlaylistIndex = -1;
 };

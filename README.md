@@ -2,14 +2,12 @@
 
 `ofxProjectM` wraps `projectM 4` for openFrameworks and focuses on Milkdrop-style visual playback, texture output, playlist control, runtime parameter control, logging, touch input, and sprites.
 
-The addon is useful both as a standalone visualizer wrapper and as a companion addon for the full `ofxVlc4` example.
+The addon is useful as a companion addon for `ofxVlc4`, especially when you want a compact player + playlist + `projectM` workflow.
 
-Examples included in this addon:
+Primary example in this addon:
 
 - `ofxProjectMExample`
-  - standalone audio-driven `projectM` with an ImGui control panel
-- `ofxProjectMSimpleVlcExample`
-  - minimal `ofxProjectM` + `ofxVlc4` bridge with VLC audio capture and an ImGui control panel
+  - compact `ofxProjectM` + `ofxVlc4` player with playlist, video preview, and side-by-side `projectM` output
 
 ## Note
 
@@ -113,9 +111,11 @@ Outputs:
 - `libs/projectM/lib/vs/Release/libprojectM-4-playlist.lib`
 - `libs/projectM/include/projectM-4`
 
-## VLC bridge example runtime
+## VLC-backed example runtime
 
-`ofxProjectMSimpleVlcExample` depends on `ofxVlc4` for `libVLC`.
+`ofxProjectMExample` depends on `ofxVlc4` for `libVLC`.
+
+`addons.make` / Project Generator only provide the code dependency on `ofxVlc4`. They do not install the VLC runtime by themselves.
 
 For a normal local setup with Project Generator, ofxVlc4 must be set up first. Start by installing the VLC runtime in the sibling addon:
 
@@ -123,7 +123,7 @@ For a normal local setup with Project Generator, ofxVlc4 must be set up first. S
 bash ../ofxVlc4/scripts/install-libvlc.sh
 ```
 
-Then sync the runnable VLC layout into the simple bridge example:
+Then sync the runnable VLC layout into the example:
 
 ```bash
 bash scripts/sync_vlc_runtime.sh
@@ -131,11 +131,22 @@ bash scripts/sync_vlc_runtime.sh
 
 That prepares:
 
-- `ofxProjectMSimpleVlcExample/bin/libvlc.dll`
-- `ofxProjectMSimpleVlcExample/bin/libvlccore.dll`
-- `ofxProjectMSimpleVlcExample/bin/plugins/`
-- `ofxProjectMSimpleVlcExample/bin/lua/`
-- `ofxProjectMSimpleVlcExample/dll/x64/` with only the root VLC DLLs needed by generated Visual Studio projects
+- `ofxProjectMExample/bin/libvlc.dll`
+- `ofxProjectMExample/bin/libvlccore.dll`
+- `ofxProjectMExample/bin/plugins/`
+- `ofxProjectMExample/bin/lua/`
+- `ofxProjectMExample/dll/x64/` with only the root VLC DLLs needed by generated Visual Studio projects
+
+So the ownership model is:
+
+- `ofxVlc4` installs and owns the `libVLC` runtime
+- `ofxProjectMExample` reuses that installed runtime for the VLC bridge workflow
+
+The sync script now defaults to `ofxProjectMExample`. If you explicitly want the older bridge sample instead, use:
+
+```bash
+bash scripts/sync_vlc_runtime.sh --example ofxProjectMSimpleVlcExample
+```
 
 ### macOS
 
@@ -193,17 +204,15 @@ bash scripts/download-projectm-assets.sh
 Useful variants:
 
 ```bash
-bash scripts/download-projectm-assets.sh --example ofxProjectMSimpleVlcExample
+bash scripts/download-projectm-assets.sh --example ofxProjectMExample
 bash scripts/download-projectm-assets.sh --presets
-bash scripts/download-projectm-assets.sh --textures --example ofxProjectMSimpleVlcExample
+bash scripts/download-projectm-assets.sh --textures --example ofxProjectMExample
 ```
 
 The script installs into:
 
 - `ofxProjectMExample/bin/data/presets`
 - `ofxProjectMExample/bin/data/textures`
-- `ofxProjectMSimpleVlcExample/bin/data/presets`
-- `ofxProjectMSimpleVlcExample/bin/data/textures`
 
 The packs are intentionally separate because they are fairly large.
 The repository keeps the example `bin/data` folders present but empty by default, so fresh clones stay lightweight and you opt into preset/texture downloads explicitly.
@@ -216,7 +225,7 @@ Manual layout if you prefer:
 
 ## ofxImGui branch
 
-`ofxProjectM`''s ImGui-based examples currently expect [`ofxImGui`''s `develop` branch](https://github.com/jvcleave/ofxImGui/tree/develop). If you install `ofxImGui` manually, prefer:
+`ofxProjectM`'s ImGui-based examples currently expect [`ofxImGui`'s `develop` branch](https://github.com/jvcleave/ofxImGui/tree/develop). If you install `ofxImGui` manually, prefer:
 
 ```bash
 git clone --branch develop https://github.com/jvcleave/ofxImGui.git
@@ -227,6 +236,7 @@ git clone --branch develop https://github.com/jvcleave/ofxImGui.git
 - The addon uses one public `ofxProjectM` facade even though implementation is now split internally.
 - The source split does not require `addon_config.mk` updates because openFrameworks auto-scans `src`.
 - The full `ofxVlc4Example` exposes part of the `projectM` surface, but the addon API is broader than the current GUI.
+- `ofxProjectMSimpleVlcExample` remains in the repo only as an older bridge sample, but `ofxProjectMExample` is the intended main example now.
 
 
 
