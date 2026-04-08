@@ -1,4 +1,4 @@
-﻿#include "ofxProjectM.h"
+#include "ofxProjectM.h"
 #include "ofxProjectMPlaylist.h"
 #include "ofxProjectMRender.h"
 
@@ -10,7 +10,7 @@ namespace {
 constexpr const char * kLogChannel = "ofxProjectM";
 constexpr int kOfxProjectMAddonVersionMajor = 1;
 constexpr int kOfxProjectMAddonVersionMinor = 0;
-constexpr int kOfxProjectMAddonVersionPatch = 0;
+constexpr int kOfxProjectMAddonVersionPatch = 1;
 constexpr const char * kOfxProjectMAddonVersionString = "1.0.1";
 std::atomic<int> gLogLevel { static_cast<int>(OF_LOG_NOTICE) };
 std::atomic<int> gProjectMRuntimeLogLevel { static_cast<int>(PROJECTM_LOG_LEVEL_INFO) };
@@ -64,7 +64,7 @@ void ofxProjectM::applyRuntimeParameters() const {
 	projectm_set_texel_offset(projectMHandle, texelOffsetX, texelOffsetY);
 }
 
-void ofxProjectM::connectProjectMCallbacks() const {
+void ofxProjectM::connectProjectMCallbacks() {
 	if (!projectMHandle) {
 		return;
 	}
@@ -226,6 +226,7 @@ void ofxProjectM::logNotice(const std::string & message) {
 	}
 }
 
+// setStatus and setError are mutually exclusive: calling one clears the other's message.
 void ofxProjectM::setStatus(const std::string & message) {
 	lastStatusMessage = message;
 	lastErrorMessage.clear();
@@ -248,7 +249,6 @@ ofxProjectM::~ofxProjectM() {
 }
 
 void ofxProjectM::init() {
-	ofSetRandomSeed(ofGetSystemTimeMillis());
 	clearLastMessages();
 
 	ofxProjectMPlaylistInternal::destroyPlaylistHandle(projectMPlaylistHandle);

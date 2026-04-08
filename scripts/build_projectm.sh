@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADDON_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECTM_REPO_URL="https://github.com/projectM-visualizer/projectm.git"
 PROJECTM_REPO_BRANCH="master"
-WINDOWS_GENERATOR="Visual Studio 18 2026"
+WINDOWS_GENERATOR="Visual Studio 17 2022"
 WINDOWS_PLATFORM="x64"
 WINDOWS_CONFIGURATION=""
 BUILD_TARGET="${BUILD_TARGET:-auto}"
@@ -150,7 +150,7 @@ run_windows_build() {
 	cat > "${ps_script}" <<'EOF'
 param(
 	[string]$AddonRoot = "",
-	[string]$Generator = "Visual Studio 18 2026",
+	[string]$Generator = "Visual Studio 17 2022",
 	[string]$Platform = "x64",
 	[string[]]$Configurations = @("Debug", "Release")
 )
