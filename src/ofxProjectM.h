@@ -166,6 +166,7 @@ public:
 	void audio(const float * buffer, int bufferSize, int channels) const;
 	void audio(const int16_t * buffer, int bufferSize, int channels) const;
 	void audio(const uint8_t * buffer, int bufferSize, int channels) const;
+	void audio(const ofSoundBuffer & soundBuffer) const;
 	void touch(float x, float y, int pressure = 1, ofxProjectMTouchType type = ofxProjectMTouchType::Random) const;
 	void touchDrag(float x, float y, int pressure = 1) const;
 	void touchDestroy(float x, float y) const;
