@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "projectM-4/projectM.h"
 #include "projectM-4/playlist.h"
+#include "projectM-4/types.h"
 
 #include <cstdint>
 #include <functional>
@@ -33,6 +34,19 @@ enum class ofxProjectMPlaylistSortPredicate {
 enum class ofxProjectMPlaylistSortOrder {
 	Ascending = SORT_ORDER_ASCENDING,
 	Descending = SORT_ORDER_DESCENDING
+};
+
+// Waveform render types used in touch events.
+enum class ofxProjectMTouchType {
+	Random = PROJECTM_TOUCH_TYPE_RANDOM,
+	Circle = PROJECTM_TOUCH_TYPE_CIRCLE,
+	RadialBlob = PROJECTM_TOUCH_TYPE_RADIAL_BLOB,
+	Blob2 = PROJECTM_TOUCH_TYPE_BLOB2,
+	Blob3 = PROJECTM_TOUCH_TYPE_BLOB3,
+	DerivativeLine = PROJECTM_TOUCH_TYPE_DERIVATIVE_LINE,
+	Blob5 = PROJECTM_TOUCH_TYPE_BLOB5,
+	Line = PROJECTM_TOUCH_TYPE_LINE,
+	DoubleLine = PROJECTM_TOUCH_TYPE_DOUBLE_LINE
 };
 
 class ofxProjectM {
