@@ -209,9 +209,8 @@ void ofxProjectM::audio(const uint8_t * buffer, int bufferSize, int channels) co
 }
 
 void ofxProjectM::audio(const ofSoundBuffer & soundBuffer) const {
-	const std::vector<float> & data = soundBuffer.getBuffer();
-	if (!data.empty()) {
-		audio(data.data(),
+	if (!soundBuffer.getBuffer().empty()) {
+		audio(soundBuffer.getBuffer().data(),
 			static_cast<int>(soundBuffer.getNumFrames()),
 			static_cast<int>(soundBuffer.getNumChannels()));
 	}
