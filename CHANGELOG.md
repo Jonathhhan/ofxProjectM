@@ -7,6 +7,7 @@ Highlights:
 - removed the repo-owned app examples again
 - documented `ofxVlc4Example` as the maintained `ofxProjectM` integration example
 - moved preset and texture asset downloads out of `ofxProjectM` and into `ofxVlc4Example`
+- added `audio(const ofSoundBuffer &)` overload for direct `ofxVlc4` integration
 
 ## 1.0.1
 

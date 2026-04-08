@@ -208,6 +208,14 @@ void ofxProjectM::audio(const uint8_t * buffer, int bufferSize, int channels) co
 	}
 }
 
+void ofxProjectM::audio(const ofSoundBuffer & soundBuffer) const {
+	if (!soundBuffer.getBuffer().empty()) {
+		audio(soundBuffer.getBuffer().data(),
+			static_cast<int>(soundBuffer.getNumFrames()),
+			static_cast<int>(soundBuffer.getNumChannels()));
+	}
+}
+
 void ofxProjectM::touch(float x, float y, int pressure, ofxProjectMTouchType type) const {
 	if (projectMHandle) {
 		projectm_touch(projectMHandle, x, y, pressure, static_cast<projectm_touch_type>(type));
