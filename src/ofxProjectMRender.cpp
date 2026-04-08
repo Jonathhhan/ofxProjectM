@@ -1,13 +1,8 @@
-﻿#include "ofxProjectM.h"
+#include "ofxProjectM.h"
+#include "ofxProjectMPlaylist.h"
 #include "ofxProjectMRender.h"
 
 #include <algorithm>
-
-namespace {
-const char ** projectMCStringArrayData(std::vector<const char *> & values) {
-	return values.empty() ? nullptr : const_cast<const char **>(values.data());
-}
-}
 
 int ofxProjectMRenderInternal::sanitizeChannelCount(int channels) {
 	return std::max(1, channels);
@@ -74,7 +69,7 @@ void ofxProjectM::setTextureSearchPaths(const std::vector<std::string> & searchP
 		auto paths = makeCStringView(textureSearchPaths);
 		projectm_set_texture_search_paths(
 			projectMHandle,
-			projectMCStringArrayData(paths),
+			ofxProjectMPlaylistInternal::projectMCStringArrayData(paths),
 			paths.size());
 	}
 }
@@ -162,7 +157,8 @@ const ofTexture & ofxProjectM::getTexture() const {
 	if (fbo.isAllocated()) {
 		return fbo.getTexture();
 	}
-
+	// FBO not yet allocated (before init()): fall back to the external texture
+	// supplied via setTexture(). This may be an empty/invalid texture.
 	return texture;
 }
 
@@ -212,9 +208,9 @@ void ofxProjectM::audio(const uint8_t * buffer, int bufferSize, int channels) co
 	}
 }
 
-void ofxProjectM::touch(float x, float y, int pressure, projectm_touch_type type) const {
+void ofxProjectM::touch(float x, float y, int pressure, ofxProjectMTouchType type) const {
 	if (projectMHandle) {
-		projectm_touch(projectMHandle, x, y, pressure, type);
+		projectm_touch(projectMHandle, x, y, pressure, static_cast<projectm_touch_type>(type));
 	}
 }
 

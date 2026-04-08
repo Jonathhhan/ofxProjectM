@@ -55,7 +55,7 @@ void ofxProjectM::applyPlaylistParameters() const {
 		filters.size());
 }
 
-void ofxProjectM::connectPlaylistCallbacks() const {
+void ofxProjectM::connectPlaylistCallbacks() {
 	if (!projectMPlaylistHandle) {
 		return;
 	}
@@ -146,7 +146,8 @@ void ofxProjectM::reloadPresets() {
 	uint32_t targetPosition =
 		restoringExistingPlaylist
 			? std::min(previousPosition, presetCount - 1)
-			: static_cast<uint32_t>(ofRandom(0, presetCount));
+			: static_cast<uint32_t>(ofRandom(presetCount));
+	// Linear scan to find the current preset by path. Acceptable for typical playlist sizes.
 	if (!currentPresetPath.empty()) {
 		for (uint32_t index = 0; index < presetCount; ++index) {
 			char * candidateItem = projectm_playlist_item(projectMPlaylistHandle, index);
@@ -228,6 +229,7 @@ bool ofxProjectM::playlistPresetLoadRequested(unsigned int index, const char * f
 	}
 
 	if (!that->playlistPresetLoadCallback) {
+		// Return false to let the playlist library use its default filesystem loading.
 		return false;
 	}
 
@@ -473,15 +475,15 @@ void ofxProjectM::clearPlaylistPresetLoadCallback() {
 	setPlaylistPresetLoadCallback({});
 }
 
-void ofxProjectM::previousPreset() const {
+void ofxProjectM::previousPreset(bool hardCut) const {
 	if (projectMPlaylistHandle) {
-		projectm_playlist_play_previous(projectMPlaylistHandle, true);
+		projectm_playlist_play_previous(projectMPlaylistHandle, hardCut);
 	}
 }
 
-void ofxProjectM::nextPreset() const {
+void ofxProjectM::nextPreset(bool hardCut) const {
 	if (projectMPlaylistHandle) {
-		projectm_playlist_play_next(projectMPlaylistHandle, true);
+		projectm_playlist_play_next(projectMPlaylistHandle, hardCut);
 	}
 }
 
@@ -492,7 +494,7 @@ void ofxProjectM::randomPreset() const {
 
 	const auto presetCount = projectm_playlist_size(projectMPlaylistHandle);
 	if (presetCount > 0) {
-		projectm_playlist_set_position(projectMPlaylistHandle, static_cast<uint32_t>(ofRandom(0, presetCount)), true);
+		projectm_playlist_set_position(projectMPlaylistHandle, static_cast<uint32_t>(ofRandom(presetCount)), true);
 	}
 }
 

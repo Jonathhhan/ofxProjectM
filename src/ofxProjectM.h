@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "projectM-4/projectM.h"
 #include "projectM-4/playlist.h"
+#include "projectM-4/types.h"
 
 #include <cstdint>
 #include <functional>
@@ -35,9 +36,31 @@ enum class ofxProjectMPlaylistSortOrder {
 	Descending = SORT_ORDER_DESCENDING
 };
 
+// Waveform render types used in touch events.
+enum class ofxProjectMTouchType {
+	Random = PROJECTM_TOUCH_TYPE_RANDOM,
+	Circle = PROJECTM_TOUCH_TYPE_CIRCLE,
+	RadialBlob = PROJECTM_TOUCH_TYPE_RADIAL_BLOB,
+	Blob2 = PROJECTM_TOUCH_TYPE_BLOB2,
+	Blob3 = PROJECTM_TOUCH_TYPE_BLOB3,
+	DerivativeLine = PROJECTM_TOUCH_TYPE_DERIVATIVE_LINE,
+	Blob5 = PROJECTM_TOUCH_TYPE_BLOB5,
+	Line = PROJECTM_TOUCH_TYPE_LINE,
+	DoubleLine = PROJECTM_TOUCH_TYPE_DOUBLE_LINE
+};
+
+// ofxProjectM is not copyable or movable; it owns non-shareable C handles.
+// Instance members (presetName, lastStatusMessage, lastErrorMessage, handles)
+// are not thread-safe. All methods must be called from the same thread unless
+// external synchronization is provided.
 class ofxProjectM {
 public:
+	ofxProjectM() = default;
 	~ofxProjectM();
+	ofxProjectM(const ofxProjectM &) = delete;
+	ofxProjectM & operator=(const ofxProjectM &) = delete;
+	ofxProjectM(ofxProjectM &&) = delete;
+	ofxProjectM & operator=(ofxProjectM &&) = delete;
 	static ofxProjectMAddonVersionInfo getAddonVersionInfo();
 	static void setLogLevel(ofLogLevel level);
 	static ofLogLevel getLogLevel();
@@ -135,13 +158,15 @@ public:
 	void update();
 	void draw(int x, int y);
 	void draw(int x, int y, int a, int b);
+	// Returns the rendered FBO texture. When the FBO is not allocated (i.e. before
+	// init() is called), falls back to the external texture set via setTexture().
 	const ofTexture & getTexture() const;
 	void bind();
 	void unbind();
 	void audio(const float * buffer, int bufferSize, int channels) const;
 	void audio(const int16_t * buffer, int bufferSize, int channels) const;
 	void audio(const uint8_t * buffer, int bufferSize, int channels) const;
-	void touch(float x, float y, int pressure = 1, projectm_touch_type type = PROJECTM_TOUCH_TYPE_RANDOM) const;
+	void touch(float x, float y, int pressure = 1, ofxProjectMTouchType type = ofxProjectMTouchType::Random) const;
 	void touchDrag(float x, float y, int pressure = 1) const;
 	void touchDestroy(float x, float y) const;
 	void clearTouches() const;
@@ -152,8 +177,8 @@ public:
 	std::vector<uint32_t> getSpriteIds() const;
 	void setMaxSprites(uint32_t maxSprites) const;
 	uint32_t getMaxSprites() const;
-	void previousPreset() const;
-	void nextPreset() const;
+	void previousPreset(bool hardCut = true) const;
+	void nextPreset(bool hardCut = true) const;
 	void randomPreset() const;
 	bool restartPreset(bool hardCut = true) const;
 	int getPresetCount() const;
@@ -164,20 +189,20 @@ public:
 	const std::string & getLastStatusMessage() const { return lastStatusMessage; }
 	const std::string & getLastErrorMessage() const { return lastErrorMessage; }
 	void clearLastMessages();
+private:
 	static void textureLoadEvent(const char * textureName, projectm_texture_load_data * data, void * userData);
 	static void presetSwitchRequested(bool hardCut, void * data);
 	static void presetSwitched(bool hardCut, unsigned int index, void* data);
 	static void presetSwitchFailed(const char* presetFilename, const char* message, void* data);
 	static bool playlistPresetLoadRequested(unsigned int index, const char * filename, bool hardCut, void * data);
-private:
 	static projectm_log_level toProjectMRuntimeLogLevel(ofLogLevel level);
 	static ofLogLevel toOfLogLevel(projectm_log_level level);
 	static std::vector<const char *> makeCStringView(const std::vector<std::string> & values);
 	static void projectMLogCallback(const char * message, projectm_log_level logLevel, void * userData);
 	void applyRuntimeParameters() const;
 	void applyPlaylistParameters() const;
-	void connectProjectMCallbacks() const;
-	void connectPlaylistCallbacks() const;
+	void connectProjectMCallbacks();
+	void connectPlaylistCallbacks();
 	void syncPresetNameFromPlaylist();
 	void setStatus(const std::string & message);
 	void setError(const std::string & message);

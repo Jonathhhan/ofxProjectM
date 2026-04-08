@@ -12,3 +12,5 @@
 # Locally built projectM outputs
 libs/projectM/include/projectM-4/
 libs/projectM/lib/vs/
+libs/projectM/lib/osx/
+libs/projectM/lib/linux64/
