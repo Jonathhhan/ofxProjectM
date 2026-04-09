@@ -157,7 +157,7 @@ public:
 	void clearPlaylistPresetLoadCallback();
 	void update();
 	void draw(int x, int y);
-	void draw(int x, int y, int a, int b);
+	void draw(int x, int y, int width, int height);
 	// Returns the rendered FBO texture. When the FBO is not allocated (i.e. before
 	// init() is called), falls back to the external texture set via setTexture().
 	const ofTexture & getTexture() const;
@@ -190,6 +190,7 @@ public:
 	const std::string & getLastStatusMessage() const { return lastStatusMessage; }
 	const std::string & getLastErrorMessage() const { return lastErrorMessage; }
 	void clearLastMessages();
+	bool isInitialized() const;
 private:
 	static void textureLoadEvent(const char * textureName, projectm_texture_load_data * data, void * userData);
 	static void presetSwitchRequested(bool hardCut, void * data);

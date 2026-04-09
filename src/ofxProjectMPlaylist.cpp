@@ -60,13 +60,12 @@ void ofxProjectM::connectPlaylistCallbacks() {
 		return;
 	}
 
-	auto * self = const_cast<ofxProjectM *>(this);
-	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, self);
-	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, self);
+	projectm_playlist_set_preset_switched_event_callback(projectMPlaylistHandle, presetSwitched, this);
+	projectm_playlist_set_preset_switch_failed_event_callback(projectMPlaylistHandle, presetSwitchFailed, this);
 	projectm_playlist_set_preset_load_event_callback(
 		projectMPlaylistHandle,
 		(presetSwitchRequestedCallback || playlistPresetLoadCallback) ? playlistPresetLoadRequested : nullptr,
-		self);
+		this);
 }
 
 void ofxProjectM::syncPresetNameFromPlaylist() {
@@ -146,7 +145,7 @@ void ofxProjectM::reloadPresets() {
 	uint32_t targetPosition =
 		restoringExistingPlaylist
 			? std::min(previousPosition, presetCount - 1)
-			: static_cast<uint32_t>(ofRandom(presetCount));
+			: std::min(static_cast<uint32_t>(ofRandom(presetCount)), presetCount - 1);
 	// Linear scan to find the current preset by path. Acceptable for typical playlist sizes.
 	if (!currentPresetPath.empty()) {
 		for (uint32_t index = 0; index < presetCount; ++index) {
@@ -494,7 +493,7 @@ void ofxProjectM::randomPreset() const {
 
 	const auto presetCount = projectm_playlist_size(projectMPlaylistHandle);
 	if (presetCount > 0) {
-		projectm_playlist_set_position(projectMPlaylistHandle, static_cast<uint32_t>(ofRandom(presetCount)), true);
+		projectm_playlist_set_position(projectMPlaylistHandle, std::min(static_cast<uint32_t>(ofRandom(presetCount)), presetCount - 1), true);
 	}
 }
 

@@ -10,8 +10,8 @@ namespace {
 constexpr const char * kLogChannel = "ofxProjectM";
 constexpr int kOfxProjectMAddonVersionMajor = 1;
 constexpr int kOfxProjectMAddonVersionMinor = 0;
-constexpr int kOfxProjectMAddonVersionPatch = 1;
-constexpr const char * kOfxProjectMAddonVersionString = "1.0.1";
+constexpr int kOfxProjectMAddonVersionPatch = 2;
+constexpr const char * kOfxProjectMAddonVersionString = "1.0.2";
 std::atomic<int> gLogLevel { static_cast<int>(OF_LOG_NOTICE) };
 std::atomic<int> gProjectMRuntimeLogLevel { static_cast<int>(PROJECTM_LOG_LEVEL_INFO) };
 std::atomic<bool> gProjectMRuntimeLogCallbackEnabled { true };
@@ -69,14 +69,13 @@ void ofxProjectM::connectProjectMCallbacks() {
 		return;
 	}
 
-	auto * self = const_cast<ofxProjectM *>(this);
-	projectm_set_texture_load_event_callback(projectMHandle, textureLoadEvent, self);
-	projectm_set_preset_switch_failed_event_callback(projectMHandle, presetSwitchFailed, self);
+	projectm_set_texture_load_event_callback(projectMHandle, textureLoadEvent, this);
+	projectm_set_preset_switch_failed_event_callback(projectMHandle, presetSwitchFailed, this);
 	if (!projectMPlaylistHandle) {
 		projectm_set_preset_switch_requested_event_callback(
 			projectMHandle,
 			presetSwitchRequestedCallback ? presetSwitchRequested : nullptr,
-			self);
+			this);
 	}
 }
 
@@ -243,6 +242,10 @@ void ofxProjectM::clearLastMessages() {
 	lastErrorMessage.clear();
 }
 
+bool ofxProjectM::isInitialized() const {
+	return projectMHandle != nullptr;
+}
+
 ofxProjectM::~ofxProjectM() {
 	ofxProjectMPlaylistInternal::destroyPlaylistHandle(projectMPlaylistHandle);
 	destroyProjectMHandle(projectMHandle);
@@ -255,6 +258,11 @@ void ofxProjectM::init() {
 	destroyProjectMHandle(projectMHandle);
 
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
+	if (!fbo.isAllocated()) {
+		setError("FBO allocation failed");
+		presetName.clear();
+		return;
+	}
 	ofxProjectMRenderInternal::clearAllocatedFbo(fbo);
 
 	projectMHandle = projectm_create();

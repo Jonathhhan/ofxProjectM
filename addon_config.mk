@@ -70,16 +70,20 @@ osx:
 	ADDON_LIBS += libs/projectM/lib/osx/libprojectM-4-playlist.a
 
 ios:
+	# Not currently supported.
 	
 linux64:
 	ADDON_LIBS += libs/projectM/lib/linux64/libprojectM-4.a
 	ADDON_LIBS += libs/projectM/lib/linux64/libprojectM-4-playlist.a
 
 linuxarmv6l:
+	# Not currently supported.
 
 linuxarmv7l:
+	# Not currently supported.
 
 msys2:
+	# Not currently supported.
 
 vs:
 	ADDON_LIBS += libs/projectM/lib/vs/$(Configuration)/libprojectM-4.lib
