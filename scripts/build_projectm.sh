@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADDON_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECTM_REPO_URL="https://github.com/projectM-visualizer/projectm.git"
 PROJECTM_REPO_BRANCH="master"
-WINDOWS_GENERATOR="Visual Studio 17 2022"
+WINDOWS_GENERATOR="${WINDOWS_GENERATOR:-}"
 WINDOWS_PLATFORM="x64"
 WINDOWS_CONFIGURATION=""
 BUILD_TARGET="${BUILD_TARGET:-auto}"
@@ -150,7 +150,7 @@ run_windows_build() {
 	cat > "${ps_script}" <<'EOF'
 param(
 	[string]$AddonRoot = "",
-	[string]$Generator = "Visual Studio 17 2022",
+	[string]$Generator = "",
 	[string]$Platform = "x64",
 	[string[]]$Configurations = @("Debug", "Release")
 )
@@ -199,6 +199,27 @@ function Find-StagedLibrary {
 	return $null
 }
 
+function Resolve-Generator {
+	param([string]$RequestedGenerator)
+
+	if (-not [string]::IsNullOrWhiteSpace($RequestedGenerator)) {
+		return $RequestedGenerator
+	}
+
+	$cmakeHelp = & cmake --help 2>&1
+	if ($LASTEXITCODE -ne 0) {
+		throw "Failed to query CMake generators."
+	}
+
+	foreach ($Line in $cmakeHelp) {
+		if ($Line -match '^\*?\s*(Visual Studio \d+ \d{4})\s*=') {
+			return $matches[1]
+		}
+	}
+
+	throw "Could not detect an installed Visual Studio CMake generator. Pass --generator explicitly."
+}
+
 if ([string]::IsNullOrWhiteSpace($AddonRoot)) {
 	$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 	$AddonRoot = Split-Path -Parent $scriptDir
@@ -213,9 +234,11 @@ $projectmRoot = Join-Path $tempRoot "projectm"
 $buildDir = Join-Path $tempRoot "build-windows-static"
 Require-Command git
 Require-Command cmake
+$Generator = Resolve-Generator -RequestedGenerator $Generator
 
 try {
 	Write-Host "==> Using temporary build root: $tempRoot"
+	Write-Host "==> Using CMake generator: $Generator"
 	New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
 
 	Write-Host "==> Fetching current projectM master"
