@@ -15,7 +15,7 @@ Parts of this addon, its examples, and its documentation were developed with AI-
 
 ## Release
 
-- addon release version: `1.0.1`
+- addon release version: `1.0.2`
 - changelog: `CHANGELOG.md`
 
 ## Highlights

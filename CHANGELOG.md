@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.2
+
+Highlights:
+
+- added `isInitialized()` convenience method to check if the projectM engine is ready
+- renamed `draw(x, y, a, b)` parameters to `draw(x, y, width, height)` for clarity
+- guarded `ofRandom()` boundary edge case in `reloadPresets()` and `randomPreset()` with `std::min`
+- added FBO allocation failure checks with error logging in `init()` and `setWindowSize()`
+- removed unnecessary `const_cast` in callback registration methods
+- added comments for unsupported platform sections in `addon_config.mk`
+- added MIT LICENSE file with projectM LGPL-2.1 notice
+
 ## Unreleased
 
 Highlights:

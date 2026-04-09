@@ -109,6 +109,10 @@ void ofxProjectM::setWindowSize(int x, int y) {
 	windowWidth = clampedWidth;
 	windowHeight = clampedHeight;
 	fbo.allocate(windowWidth, windowHeight, GL_RGBA);
+	if (!fbo.isAllocated()) {
+		logError("FBO allocation failed in setWindowSize");
+		return;
+	}
 	ofxProjectMRenderInternal::clearAllocatedFbo(fbo);
 	if (projectMHandle) {
 		projectm_set_window_size(projectMHandle, static_cast<size_t>(windowWidth), static_cast<size_t>(windowHeight));
@@ -147,9 +151,9 @@ void ofxProjectM::draw(int x, int y) {
 	}
 }
 
-void ofxProjectM::draw(int x, int y, int a, int b) {
+void ofxProjectM::draw(int x, int y, int width, int height) {
 	if (fbo.isAllocated()) {
-		fbo.getTexture().draw(x, y, a, b);
+		fbo.getTexture().draw(x, y, width, height);
 	}
 }
 
